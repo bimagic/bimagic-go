@@ -18,11 +18,11 @@ Bimagic v2.0.0 is a major breaking release rebuilt from the ground up with a mod
 
 ## Sample
 
-<img width="1920" height="1080" alt="Image" src="Sample/2026-03-11-191645_hyprshot.png" />
-<p align="center">bimagic in a terminal (kitty)</p>
+<img width="1920" height="1080" alt="Interactive Menu" src="Sample/1.png" />
+<p align="center">Interactive magic spell menu with custom theme styling</p>
 
-<img width="1920" height="1080" alt="Image" src="Sample/2026-03-11-191744_hyprshot.png" />
-<p align="center">bimagic in neovim</p>
+<img width="1920" height="1080" alt="Confirmation Modal" src="Sample/2.png" />
+<p align="center">Interactive confirmation dialog with dynamic button themes</p>
 
 ---
 
