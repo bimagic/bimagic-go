@@ -1458,8 +1458,16 @@ func lazyWizard(cliMsg string) {
 	if runGitCmd("commit", "-m", cliMsg) == nil {
 		printStatus("Committed: " + cliMsg)
 	} else {
-		printError("Commit failed (nothing to commit?)")
-		os.Exit(1)
+		if runGitCmd("rev-parse", "HEAD") == nil {
+			printCommand(`git commit --amend -m "` + cliMsg + `"`)
+			if runGitCmd("commit", "--amend", "-m", cliMsg) == nil {
+				printStatus("Updated last commit message to: " + cliMsg)
+			} else {
+				printWarning("No new changes to commit. Proceeding to push...")
+			}
+		} else {
+			printWarning("No commits or changes to commit. Proceeding to push...")
+		}
 	}
 
 	branch := getCurrentBranch()
