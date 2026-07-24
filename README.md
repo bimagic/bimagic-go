@@ -46,19 +46,35 @@ Bimagic is a powerful interactive command-line tool rewritten in **Go** for maxi
 
 ## Installation
 
+### Automated Installer (Recommended)
+
+Run the automated cross-platform installer script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bimagic/bimagic-go/main/install.sh | bash
+```
+
+Or run locally from a cloned repository:
+
+```bash
+./install.sh
+```
+
+*(Use `--user` flag or set `USE_USER_DIR=true` to install into `~/.local/bin` without root privileges).*
+
 ### From Source (Requires Go)
 
 If you have Go installed, you can install Bimagic directly:
 
 ```bash
-go install github.com/Bimbok/bimagic-go@latest
+go install github.com/bimagic/bimagic-go@latest
 ```
 
 ### Manual Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Bimbok/bimagic-go.git
+git clone https://github.com/bimagic/bimagic-go.git
 ```
 2. Build the binary:
 ```bash
@@ -68,6 +84,23 @@ go build -o bimagic main.go
 ```bash
 sudo mv bimagic /usr/local/bin/
 ```
+
+## Uninstallation
+
+To remove Bimagic from your system:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bimagic/bimagic-go/main/uninstall.sh | bash
+```
+
+Or run locally:
+
+```bash
+./uninstall.sh [--purge]
+```
+
+*(Use `--purge` or `-p` flag to also clean configuration files and theme settings in `~/.config/bimagic`).*
+
 
 ## Dependencies
 

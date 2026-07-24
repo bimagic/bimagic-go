@@ -8,9 +8,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -32,6 +34,9 @@ var theme = map[string]string{
 }
 
 func main() {
+	// Enable multi-core CPU parallelism for multithreading
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	// 1. Handle Version Flag
 	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
 		fmt.Printf("Bimagic Git Wizard %s\n", VERSION)
@@ -144,7 +149,8 @@ func main() {
 	if storedVersion != VERSION {
 		showWelcomeBanner(versionFile, configDir, storedVersion == "")
 	} else {
-		fmt.Println("Welcome to the Git Wizard! Let's work some magic...\n")
+		fmt.Println("Welcome to the Git Wizard! Let's work some magic...")
+		fmt.Println()
 	}
 
 	// 7. Interactive Main Loop
@@ -459,9 +465,16 @@ func loadTheme(path string) {
 
 // --- External Tools (Gum, Git) ---
 
+var cmdCache sync.Map
+
 func hasCmd(name string) bool {
+	if val, ok := cmdCache.Load(name); ok {
+		return val.(bool)
+	}
 	_, err := exec.LookPath(name)
-	return err == nil
+	found := err == nil
+	cmdCache.Store(name, found)
+	return found
 }
 
 func runGitCmd(args ...string) error {
@@ -594,29 +607,68 @@ func showRepoStatus() {
 		return
 	}
 
-	branch := getCurrentBranch()
-	upstream := getGitOutput("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+	var (
+		wg         sync.WaitGroup
+		branch     string
+		upstream   string
+		ahead      string = "0"
+		behind     string = "0"
+		cleanIndex bool
+		cleanCache bool
+		conflicts  string
+	)
 
-	ahead, behind := "0", "0"
-	if upstream != "" {
-		if a := getGitOutput("rev-list", "--count", upstream+"..HEAD"); a != "" {
-			ahead = a
+	wg.Add(4)
+
+	// Goroutine 1: Branch and upstream ahead/behind status
+	go func() {
+		defer wg.Done()
+		branch = getCurrentBranch()
+		upstream = getGitOutput("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+
+		if upstream != "" {
+			var abWg sync.WaitGroup
+			abWg.Add(2)
+			go func() {
+				defer abWg.Done()
+				if a := getGitOutput("rev-list", "--count", upstream+"..HEAD"); a != "" {
+					ahead = a
+				}
+			}()
+			go func() {
+				defer abWg.Done()
+				if b := getGitOutput("rev-list", "--count", "HEAD.."+upstream); b != "" {
+					behind = b
+				}
+			}()
+			abWg.Wait()
 		}
-		if b := getGitOutput("rev-list", "--count", "HEAD.."+upstream); b != "" {
-			behind = b
-		}
-	}
+	}()
+
+	// Goroutine 2: Working tree diff check
+	go func() {
+		defer wg.Done()
+		cleanIndex = runGitCmd("diff", "--quiet") == nil
+	}()
+
+	// Goroutine 3: Cached index diff check
+	go func() {
+		defer wg.Done()
+		cleanCache = runGitCmd("diff", "--cached", "--quiet") == nil
+	}()
+
+	// Goroutine 4: Unmerged conflicts check
+	go func() {
+		defer wg.Done()
+		conflicts = getGitOutput("ls-files", "-u")
+	}()
+
+	wg.Wait()
 
 	status := "🟡 uncommitted"
 	color := theme["BIMAGIC_WARNING"]
 
-	// diff --quiet
-	cleanIndex := runGitCmd("diff", "--quiet") == nil
-	cleanCache := runGitCmd("diff", "--cached", "--quiet") == nil
-
 	if cleanIndex && cleanCache {
-		// check conflicts ls-files -u
-		conflicts := getGitOutput("ls-files", "-u")
 		if conflicts != "" {
 			status = "🔴 conflicts"
 			color = theme["BIMAGIC_ERROR"]
@@ -1097,12 +1149,27 @@ func pullChangesInteractive() {
 }
 
 func createSwitchBranch() {
-	currentBranch := getCurrentBranch()
+	var (
+		wg             sync.WaitGroup
+		currentBranch  string
+		branchesOutput string
+	)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		currentBranch = getCurrentBranch()
+	}()
+	go func() {
+		defer wg.Done()
+		branchesOutput = getGitOutput("branch", "-a", "--format=%(refname:short)")
+	}()
+	wg.Wait()
+
 	printStatus("Current branch: " + currentBranch)
 	fmt.Println()
 	printStatus("Available branches:")
 
-	branchesOutput := getGitOutput("branch", "-a", "--format=%(refname:short)")
 	branches := strings.Split(branchesOutput, "\n")
 	uniqueBranches := make(map[string]bool)
 
@@ -1241,7 +1308,8 @@ func removeFilesLogic() {
 
 func uninitializeRepo() {
 	printWarning("This will completely uninitialize the Git repository in this folder.")
-	fmt.Println("This action will delete the .git directory and cannot be undone!\n")
+	fmt.Println("This action will delete the .git directory and cannot be undone!")
+	fmt.Println()
 
 	if gumConfirm("Are you sure you want to continue?") {
 		if _, err := os.Stat(".git"); !os.IsNotExist(err) {
