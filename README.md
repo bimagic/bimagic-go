@@ -1,16 +1,20 @@
-# Bimagic - The Go-Powered Git Wizard
+# Bimagic v2.0.0 - The Go-Powered Git Wizard 🔮
 
 <p align="center">
-  <img width="400" style="border-radius: 12px;" alt="Image" src="./Sample/logo.png" />
+  <img width="400" style="border-radius: 12px;" alt="Bimagic Logo" src="./Sample/logo.png" />
 </p>
 
 <p align="center">By Bimbok and adityapaul26</p>
 
-A lightning-fast, Go-based Git automation tool that simplifies your GitHub workflow with an interactive magic menu.
+A lightning-fast, multi-threaded, Go-based Git automation tool that simplifies your GitHub workflow with an interactive magic menu.
 
-## Overview
+---
 
-Bimagic is a powerful interactive command-line tool rewritten in **Go** for maximum performance and reliability. It streamlines common Git operations, making version control more accessible through a user-friendly menu interface. It handles repository initialization, committing, branching, and remote operations with GitHub integration using personal access tokens.
+## 🚀 Overview (v2.0.0 Major Release)
+
+Bimagic v2.0.0 is a major breaking release rebuilt from the ground up with a modular Go package structure (`pkg/`), multi-threaded CPU parallel execution, and pervasive dynamic theme integration. It streamlines all common and advanced Git operations through a fluid terminal menu interface.
+
+---
 
 ## Sample
 
@@ -20,31 +24,37 @@ Bimagic is a powerful interactive command-line tool rewritten in **Go** for maxi
 <img width="1920" height="1080" alt="Image" src="Sample/2026-03-11-191744_hyprshot.png" />
 <p align="center">bimagic in neovim</p>
 
-## Features
+---
 
-- 🔮 **Interactive Magic Menu**: Driven by `gum` for a modern, fluid UI.
-- 🔐 **Secure GitHub Auth**: Integration via personal access tokens.
-- 📦 **Instant Initialization**: Setup new repositories with auto-renaming (`master` → `main`).
-- 📥 **Smart Cloning**: Standard or Interactive selection (Sparse Checkout).
-- 📊 **Themed Progress Bar**: Real-time visual feedback for cloning operations.
+## ✨ Features & What's New in v2.0.0
+
+- ⚡ **Multi-Threaded Speed Engine**: Multi-core CPU parallelism (`runtime.GOMAXPROCS` & `sync.WaitGroup`) rendering status dashboards in under **60ms**.
+- 📦 **Modular Package Architecture**: Clean domain separation (`pkg/config`, `pkg/ui`, `pkg/git`, `pkg/spells`) for maximum stability and maintainability.
+- 🪄 **Shortcut Symlink (`wz`)**: Automatically provisions `wz -> bimagic` shortcut symlinks during installation. Run with `bimagic` or `wz`!
+- 🎨 **Full Theme Adaptation**: Every button, prompt, selector, input box, and modal dynamically inherits colors from `~/.config/bimagic/theme.wz`.
+- 🔮 **Interactive Magic Menu**: Driven by Charm's `gum` with Nerd Font iconography.
+- 🧙‍♂️ **Resilient Lazy Wizard (`-z`)**: Intelligently handles already-committed repositories by updating commit messages via `--amend` and pushing directly.
+- 🔐 **Secure GitHub Auth**: Integration via personal access tokens or SSH.
+- 📦 **Instant Initialization**: Setup new repositories guaranteed with `main` branch default (`git init -b main`).
+- 📥 **Smart & Sparse Cloning**: Standard clone or interactive file selection (`--filter=blob:none`).
+- 📊 **Real-time Progress Bar**: Visual feedback for git object downloads and delta resolution.
 - 🗜️ **Shallow Clone Support**: Use `--depth` for lightweight clones.
-- 🔄 **Simplified Remote Ops**: Effortless push/pull management.
-- 🌿 **Branch Mastery**: Easy creation and switching between branches.
-- 📊 **Status Dashboard**: Live view of ahead/behind counts, branch state, and conflicts.
-- 🛡️ **Safe File Management**: Intelligent file/folder removal with Git integration.
-- 📈 **Contributor Statistics**: Detailed activity analysis with time-range filtering.
-- 🌐 **Git Graph Viewer**: Pretty, colorized tree visualization of your history.
-- 📜 **The Architect**: Interactive `.gitignore` generator with 70+ industry blueprints.
-- 🔀 **Merge Magic**: Branch merging with conflict detection.
-- ⏪ **Revert Spells**: Multi-select and revert previous commits safely.
-- 🪨 **Resurrection Stone**: Recover "lost" work from the Git reflog.
-- 🎨 **Theme Alchemy**: Full UI customization via `theme.wz` (ANSI & Hex support).
-- ⏳ **Time Turner**: Undo the last commit with Soft, Mixed, or Hard levels.
-- 🗃️ **Stash Mastery**: Complete control over your Git stashes.
-- 🔍 **The Scrying Glass**: Instant file preview with syntax highlighting (`bat` support).
-- ⚡ **Command Transparency**: Displays the exact Git commands being executed.
+- 🔄 **Simplified Remote Ops**: Automated push/pull and upstream tracking.
+- 🌿 **Branch Mastery**: Concurrent creation, switching, and merging between branches.
+- 📊 **Status Dashboard**: Live view of ahead/behind counts, branch state, and merge conflict warnings.
+- 🛡️ **Safe File Management**: Intelligent file/folder removal (`git rm` vs `rm -rf`).
+- 📈 **Contributor Statistics**: Contribution reports across custom time ranges (7d, 30d, 90d, 1y, all time).
+- 🌐 **Git Graph Viewer**: Colorized tree log visualization of repository history.
+- 📜 **The Architect**: Interactive `.gitignore` generator with 70+ industry templates.
+- ⏪ **Revert Spells**: Multi-select commit revert with conflict safety.
+- 🪨 **Resurrection Stone**: Recover deleted commits directly from the Git reflog.
+- ⏳ **Time Turner**: Undo recent commits with Soft, Mixed, or Hard level resets.
+- 🗃️ **Stash Mastery**: Complete control over Git stashes (Push, Pop, List, Apply, Drop, Clear).
+- 🔍 **The Scrying Glass**: Instant file preview with `fzf` & `bat` syntax highlighting.
 
-## Installation
+---
+
+## 🛠️ Installation
 
 ### Automated Installer (Recommended)
 
@@ -60,11 +70,9 @@ Or run locally from a cloned repository:
 ./install.sh
 ```
 
-*(Use `--user` flag or set `USE_USER_DIR=true` to install into `~/.local/bin` without root privileges).*
+*(Use `--system` flag to install into `/usr/local/bin` for all users, or default to `~/.local/bin` without root).*
 
 ### From Source (Requires Go)
-
-If you have Go installed, you can install Bimagic directly:
 
 ```bash
 go install github.com/bimagic/bimagic-go@latest
@@ -78,16 +86,19 @@ git clone https://github.com/bimagic/bimagic-go.git
 ```
 2. Build the binary:
 ```bash
-go build -o bimagic main.go
+go build -ldflags="-s -w" -o bimagic main.go
 ```
-3. Move to your path:
+3. Move to your PATH and create `wz` symlink:
 ```bash
 sudo mv bimagic /usr/local/bin/
+sudo ln -sf /usr/local/bin/bimagic /usr/local/bin/wz
 ```
 
-## Uninstallation
+---
 
-To remove Bimagic from your system:
+## 🗑️ Uninstallation
+
+To remove Bimagic and its shortcut symlink:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/bimagic/bimagic-go/main/uninstall.sh | bash
@@ -99,21 +110,24 @@ Or run locally:
 ./uninstall.sh [--purge]
 ```
 
-*(Use `--purge` or `-p` flag to also clean configuration files and theme settings in `~/.config/bimagic`).*
+*(Use `--purge` or `-p` flag to also remove configuration files in `~/.config/bimagic`).*
 
+---
 
-## Dependencies
+## ⚡ Dependencies
 
-- **[gum](https://github.com/charmbracelet/gum)** (Required): Powers the interactive UI.
-- **Git** (Required): The engine behind the magic.
-- **[bat](https://github.com/sharkdp/bat)** (Optional): For syntax highlighting in The Scrying Glass.
-- **[fzf](https://github.com/junegunn/fzf)** (Optional): For enhanced file selection previews.
+- **[gum](https://github.com/charmbracelet/gum)** (Required): Powers interactive TUI elements.
+- **Git** (Required): Version control engine.
+- **[bat](https://github.com/sharkdp/bat)** (Optional): Syntax highlighting in The Scrying Glass.
+- **[fzf](https://github.com/junegunn/fzf)** (Optional): Fuzzy file selection with preview windows.
 
-## Configuration
+---
+
+## ⚙️ Configuration & Themes
 
 ### GitHub Credentials
 
-Bimagic looks for these environment variables in your shell config (`.zshrc`, `.bashrc`, etc.):
+Configure environment variables in your shell profile (`.zshrc`, `.bashrc`, etc.):
 
 ```bash
 export GITHUB_USER="your_username"
@@ -122,9 +136,8 @@ export GITHUB_TOKEN="your_personal_access_token"
 
 ### Theme Customization 🎨
 
-Customize your wizard's appearance at `~/.config/bimagic/theme.wz`.
+Customize your wizard's appearance at `~/.config/bimagic/theme.wz`:
 
-#### Example `theme.wz`:
 ```bash
 BIMAGIC_PRIMARY="#00FFFF"
 BIMAGIC_SECONDARY="#00AFFF"
@@ -135,47 +148,32 @@ BIMAGIC_INFO="#00FFAF"
 BIMAGIC_MUTED="243"
 ```
 
-## Usage
+---
 
-Simply run:
+## 💻 Usage
+
+Cast your spells using either command:
 ```bash
 bimagic
+# or
+wz
 ```
 
 ### Command Line Flags
 
-Perform quick actions without entering the full menu:
+Perform quick actions directly:
 
-- **Clone**: `bimagic -d "url" [--depth 1] [-i]`
-- **Lazy Wizard** (Add + Commit + Push): `bimagic -z "message"`
-- **Status**: `bimagic -s`
-- **Graph**: `bimagic -g`
-- **Undo**: `bimagic -u`
-- **Architect**: `bimagic -a`
+- **Clone**: `wz -d "url" [--depth 1] [-i]`
+- **Lazy Wizard** (Add + Commit/Amend + Push): `wz -z "commit message"`
+- **Status**: `wz -s`
+- **Graph**: `wz -g`
+- **Undo**: `wz -u`
+- **Architect**: `wz -a`
+- **Pull**: `wz -p`
 
-## Menu Spells
+---
 
-1. **Clone repository**: Standard or Interactive selection.
-2. **Init new repo**: Fresh Git setup with `main` branch default.
-3. **Add files**: Multi-select staging with `[ALL]` support.
-4. **Commit changes**: Magic Commit (Conventional) or Quick Commit.
-5. **Push to remote**: Automated push with upstream detection.
-6. **Pull latest changes**: Fetch and merge from remotes.
-7. **Create/switch branch**: Interactive branch management.
-8. **Set remote**: Configure HTTPS (token) or SSH remotes.
-9. **Show status**: Detailed repository health dashboard.
-10. **Contributor Statistics**: Who's casting the most spells?
-11. **Git graph**: Visual history map.
-12. **The Architect**: Summon a `.gitignore` from 70+ templates.
-13. **Remove files/folders**: Safe deletion with Git awareness.
-14. **Merge branches**: Bring work together seamlessly.
-15. **Uninitialize repo**: Remove Git tracking.
-16. **Resurrection Stone**: Recover deleted commits from the reflog.
-17. **Revert commit(s)**: Multi-select revert with conflict warnings.
-18. **Stash operations**: Push, Pop, List, and more.
-19. **The Scrying Glass**: Quick file preview with optional highlighting.
-
-## License
+## 📄 License
 
 This project is open-source under the **MIT License**.
 
