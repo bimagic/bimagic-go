@@ -128,7 +128,7 @@ func ShowRepoStatus() {
 	}
 
 	status := "🟡 uncommitted"
-	borderColor := config.Theme["BIMAGIC_WARNING"]
+	borderColor := config.Theme["BIMAGIC_PRIMARY"]
 
 	if hasConflicts {
 		status = "🔴 conflicts"
@@ -151,17 +151,29 @@ func ShowRepoStatus() {
 	DrawRoundedBox(borderColor, line1, line2, line3, line4)
 }
 
-// DrawRoundedBox renders styled rounded borders natively in Go (0ms overhead)
+func displayCols(s string) int {
+	w := 0
+	for _, r := range s {
+		// Emoji symbols (like 🟡, 🔴, 🟢) occupy 2 display columns in terminal emulators
+		if r == '🟡' || r == '🟢' || r == '🔴' || r == '✨' || (r >= 0x1F300 && r <= 0x1F9FF) {
+			w += 2
+		} else {
+			w += 1
+		}
+	}
+	return w
+}
+
+// DrawRoundedBox renders styled rounded borders natively in Go (0ms overhead) with precise column alignment
 func DrawRoundedBox(borderHexOrAnsi string, lines ...string) {
 	c := config.GetAnsiEsc(borderHexOrAnsi)
 	nc := "\033[0m"
 
 	maxLen := 0
 	for _, l := range lines {
-		// Visible length calculation (ignoring status emojis/ANSI if needed)
-		runeCount := len([]rune(l))
-		if runeCount > maxLen {
-			maxLen = runeCount
+		w := displayCols(l)
+		if w > maxLen {
+			maxLen = w
 		}
 	}
 	padding := 2
@@ -170,8 +182,8 @@ func DrawRoundedBox(borderHexOrAnsi string, lines ...string) {
 	fmt.Println()
 	fmt.Printf("%s╭%s╮%s\n", c, strings.Repeat("─", width), nc)
 	for _, l := range lines {
-		runeCount := len([]rune(l))
-		padRight := width - padding - runeCount
+		w := displayCols(l)
+		padRight := width - padding - w
 		if padRight < 0 {
 			padRight = 0
 		}
