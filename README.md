@@ -54,7 +54,64 @@ Bimagic is a lightning-fast, Go-powered interactive command-line tool that strea
 
 ## Installation
 
-### Automated Installation (Recommended)
+### Windows Installation Guide 🪟
+
+Bimagic runs natively on Windows 10/11 inside **Windows Terminal**, **PowerShell**, **Command Prompt**, or **Git Bash** without requiring WSL or Linux emulation.
+
+#### Step 1: Install Dependencies (`gum`)
+
+Install Charm's `gum` UI engine using your preferred Windows package manager in PowerShell:
+
+```powershell
+# Using Winget (Recommended)
+winget install charmbracelet.gum
+
+# OR using Scoop
+scoop install gum
+
+# OR using Chocolatey
+choco install gum
+```
+
+#### Step 2: Download or Build `bimagic.exe`
+
+**Option A: Download Pre-built Executable**
+- Download `bimagic.exe` directly from [GitHub Releases](https://github.com/bimagic/bimagic-go/releases).
+
+**Option B: Install via Go**
+```powershell
+go install github.com/bimagic/bimagic-go@latest
+```
+
+**Option C: Build from Source**
+```powershell
+git clone https://github.com/bimagic/bimagic-go.git
+cd bimagic-go
+go build -ldflags="-s -w" -o bimagic.exe main.go
+```
+
+#### Step 3: Add to System PATH & Set `wz` Alias
+
+1. Create a folder (e.g. `C:\Users\YourName\bin`) and copy `bimagic.exe` into it.
+2. Add `C:\Users\YourName\bin` to your User Environment Variables **Path**.
+3. Open your PowerShell Profile to configure the `wz` shortcut alias and `Ctrl + B` keybinding:
+   ```powershell
+   notepad $PROFILE
+   ```
+4. Append the following lines:
+   ```powershell
+   # Bimagic PowerShell Shortcut & Keybinding
+   Set-Alias wz bimagic.exe
+   Set-PSReadLineKeyHandler -Key "Ctrl+b" -ScriptBlock {
+       [Microsoft.PowerShell.PSConsoleReadLine]::Insert("wz")
+       [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+   }
+   ```
+5. Save the file and restart PowerShell. Now run `bimagic` or `wz` or press **Ctrl + B**!
+
+---
+
+### Automated Installer for Linux / macOS (Recommended)
 
 Run this one-line command to install Bimagic:
 
