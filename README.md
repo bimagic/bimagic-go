@@ -476,9 +476,37 @@ Inspect repository changes without leaving the wizard:
 - **File Diff**: Select specific modified files to inspect.
 - **Branch Comparison**: Compare differences between two branches (`git diff branch1..branch2`).
 
-### Cherry-Pick Commits (Option 12)
+### Branch Operations (Option 9)
 
-Pluck specific commits from history or other branches and apply them directly onto your current branch (`git cherry-pick <hash>`). Features interactive commit search and conflict reporting.
+Comprehensive branch management:
+- **Switch Branch**: Interactive selector (`gum filter`) with visual marker (`➤`) pointing to the active branch.
+- **Create Branch**: Prompt for new branch name (`git checkout -b <name>`).
+- **Rename Branch**: Rename the current branch (`git branch -m <new-name>`).
+- **Delete Branch**: Interactively select local branches to delete with safe (`-d`) or force (`-D`) options.
+
+### The Lazy Wizard (`-z` CLI Flag)
+
+The ultimate fast-track spell: `wz -z "commit message"`.
+- Automatically stages all modified and untracked files (`git add .`).
+- Commits with your message (`git commit -m`).
+- **Smart Amend**: If the working directory has no new changes but already contains a commit, it updates the previous commit message (`git commit --amend -m`).
+- Pushes directly to the remote repository (`git push`), setting up stream tracking if needed.
+
+### Cross-Platform Compilation
+
+Bimagic is written in Go and can be cross-compiled for any OS without external build tools:
+- **Windows (64-bit Executable)**:
+  ```bash
+  GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o bimagic.exe main.go
+  ```
+- **macOS (Apple Silicon / Intel)**:
+  ```bash
+  GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o bimagic-darwin main.go
+  ```
+- **Linux (64-bit / ARM)**:
+  ```bash
+  GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bimagic-linux main.go
+  ```
 
 ### Contributor Statistics (Option 15)
 
