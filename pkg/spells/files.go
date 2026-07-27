@@ -26,8 +26,12 @@ func AddFilesLogic() {
 		}
 
 		out := git.GetGitOutput("ls-files", "--others", "--modified", "--exclude-standard")
+		if out == "" {
+			ui.PrintWarning("No modified or untracked files to stage.")
+			break
+		}
 		filesList := "[ALL]\n" + out
-		files := ui.GumFilterStdin(filesList, "Select files to add", true)
+		files := ui.GumFilterStdin(filesList, "Select files to stage", true)
 
 		if files == "" {
 			ui.PrintWarning("No files selected.")
@@ -44,10 +48,88 @@ func AddFilesLogic() {
 					}
 				}
 				ui.PrintStatus("Selected files staged.")
-				fmt.Println(files)
 			}
 		}
 		break
+	}
+}
+
+func UnstageFilesLogic() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
+	stagedOut := git.GetGitOutput("diff", "--name-only", "--cached")
+	if stagedOut == "" {
+		ui.PrintWarning("No staged files to unstage.")
+		return
+	}
+
+	filesList := "[ALL]\n" + stagedOut
+	files := ui.GumFilterStdin(filesList, "Select files to unstage", true)
+
+	if files == "" {
+		ui.PrintWarning("No files selected.")
+		return
+	}
+
+	if strings.Contains(files, "[ALL]") {
+		ui.PrintCommand("git restore --staged .")
+		if git.RunGitCmd("restore", "--staged", ".") == nil {
+			ui.PrintStatus("All files unstaged.")
+		} else {
+			ui.PrintCommand("git reset HEAD .")
+			git.RunGitCmd("reset", "HEAD", ".")
+			ui.PrintStatus("All files unstaged.")
+		}
+	} else {
+		for _, f := range strings.Split(files, "\n") {
+			if f != "" {
+				ui.PrintCommand(`git restore --staged "` + f + `"`)
+				if git.RunGitCmd("restore", "--staged", f) != nil {
+					git.RunGitCmd("reset", "HEAD", f)
+				}
+			}
+		}
+		ui.PrintStatus("Selected files unstaged.")
+	}
+}
+
+func DiscardChangesLogic() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
+	modifiedOut := git.GetGitOutput("ls-files", "--modified")
+	if modifiedOut == "" {
+		ui.PrintWarning("No modified files to discard.")
+		return
+	}
+
+	filesList := "[ALL]\n" + modifiedOut
+	files := ui.GumFilterStdin(filesList, "Select files to DISCARD local modifications", true)
+
+	if files == "" {
+		ui.PrintWarning("No files selected.")
+		return
+	}
+
+	if ui.GumConfirm(" DANGER: This will permanently overwrite your local changes! Continue?") {
+		if strings.Contains(files, "[ALL]") {
+			ui.PrintCommand("git checkout -- .")
+			git.RunGitCmd("checkout", "--", ".")
+			ui.PrintStatus("All local modifications discarded.")
+		} else {
+			for _, f := range strings.Split(files, "\n") {
+				if f != "" {
+					ui.PrintCommand(`git checkout -- "` + f + `"`)
+					git.RunGitCmd("checkout", "--", f)
+				}
+			}
+			ui.PrintStatus("Selected file modifications discarded.")
+		}
+	} else {
+		ui.PrintStatus("Operation cancelled.")
 	}
 }
 
@@ -67,6 +149,10 @@ func RemoveFilesLogic() {
 		}
 
 		out := git.GetGitOutput("ls-files", "--cached", "--others", "--exclude-standard")
+		if out == "" {
+			ui.PrintWarning("No files found to remove.")
+			break
+		}
 		files := ui.GumFilterStdin(out, "Select files/folders to remove", true)
 
 		if files == "" {

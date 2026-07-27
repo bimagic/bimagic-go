@@ -39,8 +39,13 @@ Bimagic is an interactive command-line tool rewritten in **Go** for maximum perf
 - 📥 **Smart & Sparse Cloning**: Standard clone or interactive file selection (`--filter=blob:none`).
 - 📊 **Real-time Progress Bar**: Visual feedback for git object downloads and delta resolution.
 - 🗜️ **Shallow Clone Support**: Use `--depth` for lightweight clones.
+- ↩️ **Unstage Files Wizard**: Interactive multi-select unstaging (`git restore --staged`).
+- 🧹 **Discard Modifications**: Interactive discard of local changes (`git checkout --`).
+- 🏷️ **Tag Mastery**: Complete tag lifecycle (create annotated/lightweight, list, push, delete local & remote tags).
+- 🔍 **Diff & Inspection Wizard**: Interactive viewer for unstaged diffs, staged diffs, file diffs, and branch comparisons.
+- 🍒 **Cherry-Pick Wizard**: Select and apply commits onto current branch with conflict resolution.
+- 🌿 **Branch Mastery**: Create, switch, rename (`-m`), and delete (`-d`/`-D`) local branches.
 - 🔄 **Simplified Remote Ops**: Automated push/pull and upstream tracking.
-- 🌿 **Branch Mastery**: Concurrent creation, switching, and merging between branches.
 - 📊 **Status Dashboard**: Live view of ahead/behind counts, branch state, and merge conflict warnings.
 - 🛡️ **Safe File Management**: Intelligent file/folder removal (`git rm` vs `rm -rf`).
 - 📈 **Contributor Statistics**: Contribution reports across custom time ranges (7d, 30d, 90d, 1y, all time).

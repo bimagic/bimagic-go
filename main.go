@@ -72,6 +72,10 @@ func main() {
 			cliMode = "pull"
 		case "-a", "--architect":
 			cliMode = "architect"
+		case "-t", "--tag":
+			cliMode = "tag"
+		case "--diff":
+			cliMode = "diff"
 		default:
 			if cliMode == "clone" && cliURL == "" {
 				cliURL = args[i]
@@ -112,6 +116,12 @@ func main() {
 	case "lazy":
 		spells.LazyWizard(cliMsg)
 		os.Exit(0)
+	case "tag":
+		spells.TagOperations()
+		os.Exit(0)
+	case "diff":
+		spells.DiffWizard()
+		os.Exit(0)
 	}
 
 	// Warn if credentials are not set
@@ -141,11 +151,16 @@ func main() {
 		options := []string{
 			" Clone repository",
 			" Init new repo",
-			" Add files",
+			" Add / Stage files",
+			"↩️  Unstage files",
+			"🧹 Discard local modifications",
 			" Commit changes",
 			" Push to remote",
 			" Pull latest changes",
-			" Create/switch branch",
+			" Branch operations (Switch, Create, Rename, Delete)",
+			"🏷️  Tag operations (Create, List, Push, Delete)",
+			"🔍 Diff & inspection wizard",
+			"🍒 Cherry-pick commits",
 			" Set remote",
 			"󱖫 Show status",
 			" Contributor Statistics",
@@ -185,8 +200,23 @@ func main() {
 		case " Init new repo":
 			spells.InitRepo()
 
-		case " Add files":
+		case " Add / Stage files":
 			spells.AddFilesLogic()
+
+		case "↩️  Unstage files":
+			spells.UnstageFilesLogic()
+
+		case "🧹 Discard local modifications":
+			spells.DiscardChangesLogic()
+
+		case "🏷️  Tag operations (Create, List, Push, Delete)":
+			spells.TagOperations()
+
+		case "🔍 Diff & inspection wizard":
+			spells.DiffWizard()
+
+		case "🍒 Cherry-pick commits":
+			spells.CherryPickWizard()
 
 		case " Commit changes":
 			commitMode := ui.GumChoose("", "", "", "󰦥 Magic Commit (Builder)", "󱐋 Quick Commit (One-line)")
@@ -217,7 +247,7 @@ func main() {
 		case " Pull latest changes":
 			spells.PullChangesInteractive()
 
-		case " Create/switch branch":
+		case " Branch operations (Switch, Create, Rename, Delete)":
 			spells.CreateSwitchBranch()
 
 		case " Set remote":

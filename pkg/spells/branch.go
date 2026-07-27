@@ -11,6 +11,10 @@ import (
 )
 
 func CreateSwitchBranch() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
 	var (
 		wg             sync.WaitGroup
 		currentBranch  string
@@ -52,8 +56,16 @@ func CreateSwitchBranch() {
 	}
 	fmt.Println()
 
-	branchOpt := ui.GumChoose("", "", "", "Switch to existing branch", "Create new branch")
-	if branchOpt == "Switch to existing branch" {
+	branchOpt := ui.GumChoose("Branch Operations", "", "",
+		"Switch to existing branch",
+		"Create new branch",
+		"Rename current branch",
+		"Delete local branch",
+		"Cancel",
+	)
+
+	switch branchOpt {
+	case "Switch to existing branch":
 		branchesOnly := git.GetGitOutput("branch", "--format=%(refname:short)")
 		existingBranch := ui.GumFilterStdin(branchesOnly, "Select branch to switch to", false)
 		if existingBranch != "" {
@@ -63,7 +75,7 @@ func CreateSwitchBranch() {
 		} else {
 			ui.PrintWarning("No branch selected.")
 		}
-	} else if branchOpt == "Create new branch" {
+	case "Create new branch":
 		newBranch := ui.GumInput("Enter new branch name", "")
 		if newBranch != "" {
 			ui.PrintCommand(`git checkout -b "` + newBranch + `"`)
@@ -72,12 +84,82 @@ func CreateSwitchBranch() {
 		} else {
 			ui.PrintError("No branch name provided.")
 		}
-	} else {
+	case "Rename current branch":
+		RenameBranch()
+	case "Delete local branch":
+		DeleteBranch()
+	default:
 		ui.PrintWarning("Operation cancelled.")
 	}
 }
 
+func DeleteBranch() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
+	currentBranch := git.GetCurrentBranch()
+	branchesOut := git.GetGitOutput("branch", "--format=%(refname:short)")
+
+	var candidateBranches []string
+	for _, b := range strings.Split(branchesOut, "\n") {
+		b = strings.TrimSpace(b)
+		if b != "" && b != currentBranch {
+			candidateBranches = append(candidateBranches, b)
+		}
+	}
+
+	if len(candidateBranches) == 0 {
+		ui.PrintWarning("No other local branches available to delete.")
+		return
+	}
+
+	targetBranch := ui.GumFilterStdin(strings.Join(candidateBranches, "\n"), "Select branch to delete", false)
+	if targetBranch == "" {
+		ui.PrintWarning("No branch selected.")
+		return
+	}
+
+	force := "-d"
+	if ui.GumConfirm(fmt.Sprintf("Force delete branch '%s' (-D)? (Choose No for safe delete -d)", targetBranch)) {
+		force = "-D"
+	}
+
+	if ui.GumConfirm(fmt.Sprintf("Are you sure you want to delete branch '%s' (%s)?", targetBranch, force)) {
+		ui.PrintCommand(fmt.Sprintf(`git branch %s "%s"`, force, targetBranch))
+		if git.RunGitCmd("branch", force, targetBranch) == nil {
+			ui.PrintStatus(fmt.Sprintf("Branch '%s' deleted successfully.", targetBranch))
+		} else {
+			ui.PrintError(fmt.Sprintf("Failed to delete branch '%s'.", targetBranch))
+		}
+	}
+}
+
+func RenameBranch() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
+	currentBranch := git.GetCurrentBranch()
+	newName := ui.GumInput(fmt.Sprintf("Enter new name for current branch '%s'", currentBranch), "")
+	if newName == "" {
+		ui.PrintWarning("No name provided. Rename cancelled.")
+		return
+	}
+
+	ui.PrintCommand(fmt.Sprintf(`git branch -m "%s"`, newName))
+	if git.RunGitCmd("branch", "-m", newName) == nil {
+		ui.PrintStatus(fmt.Sprintf("Renamed branch '%s' -> '%s'", currentBranch, newName))
+	} else {
+		ui.PrintError("Failed to rename branch.")
+	}
+}
+
 func PushToRemote() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
 	branch := git.GetCurrentBranch()
 	remotesStr := git.GetGitOutput("remote")
 
@@ -112,6 +194,10 @@ func PushToRemote() {
 }
 
 func PullLatestChanges() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
 	ui.PrintCommand("git fetch --all")
 	if ui.GumSpin("Fetching updates...", "git", "fetch", "--all") {
 		ui.PrintStatus("Fetch complete.")
@@ -128,6 +214,10 @@ func PullLatestChanges() {
 }
 
 func PullChangesInteractive() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
 	if ui.GumSpin("Fetching updates...", "git", "fetch", "--all") {
 		ui.PrintStatus("Fetch complete.")
 	} else {
@@ -177,6 +267,10 @@ func PullChangesInteractive() {
 }
 
 func MergeBranches() {
+	if !git.IsGitRepo() {
+		ui.PrintError("Not a git repository!")
+		return
+	}
 	currentBranch := git.GetCurrentBranch()
 	ui.PrintStatus("You are on branch: " + currentBranch)
 	fmt.Println()
