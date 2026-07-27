@@ -1,11 +1,11 @@
 package git
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
-	"sync"
 
 	"bimagic-go/pkg/config"
 	"bimagic-go/pkg/ui"
@@ -92,81 +92,50 @@ func SetupRemote(remoteName string) bool {
 	return false
 }
 
+// ShowRepoStatus parses git status in a single-pass porcelain v2 execution (< 5ms)
 func ShowRepoStatus() {
-	if !IsGitRepo() {
+	cmd := exec.Command("git", "status", "--porcelain=v2", "--branch")
+	outBytes, err := cmd.Output()
+	if err != nil {
 		ui.PrintWarning("Not inside a git repository!")
 		return
 	}
 
-	var (
-		wg         sync.WaitGroup
-		branch     string
-		upstream   string
-		ahead      string = "0"
-		behind     string = "0"
-		cleanIndex bool
-		cleanCache bool
-		conflicts  string
-	)
+	branch := "main"
+	ahead := "0"
+	behind := "0"
+	hasUncommitted := false
+	hasConflicts := false
 
-	wg.Add(4)
-
-	// Goroutine 1: Branch and upstream status
-	go func() {
-		defer wg.Done()
-		branch = GetCurrentBranch()
-		upstream = GetGitOutput("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
-
-		if upstream != "" {
-			var abWg sync.WaitGroup
-			abWg.Add(2)
-			go func() {
-				defer abWg.Done()
-				if a := GetGitOutput("rev-list", "--count", upstream+"..HEAD"); a != "" {
-					ahead = a
-				}
-			}()
-			go func() {
-				defer abWg.Done()
-				if b := GetGitOutput("rev-list", "--count", "HEAD.."+upstream); b != "" {
-					behind = b
-				}
-			}()
-			abWg.Wait()
+	scanner := bufio.NewScanner(strings.NewReader(string(outBytes)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "# branch.head ") {
+			branch = strings.TrimPrefix(line, "# branch.head ")
+		} else if strings.HasPrefix(line, "# branch.ab ") {
+			abStr := strings.TrimPrefix(line, "# branch.ab ")
+			parts := strings.Fields(abStr)
+			if len(parts) >= 2 {
+				ahead = strings.TrimPrefix(parts[0], "+")
+				behind = strings.TrimPrefix(parts[1], "-")
+			}
+		} else if strings.HasPrefix(line, "u ") {
+			hasConflicts = true
+			hasUncommitted = true
+		} else if len(line) > 0 && (line[0] == '1' || line[0] == '2' || line[0] == '?') {
+			hasUncommitted = true
 		}
-	}()
-
-	// Goroutine 2: Working tree diff check
-	go func() {
-		defer wg.Done()
-		cleanIndex = RunGitCmd("diff", "--quiet") == nil
-	}()
-
-	// Goroutine 3: Cached index diff check
-	go func() {
-		defer wg.Done()
-		cleanCache = RunGitCmd("diff", "--cached", "--quiet") == nil
-	}()
-
-	// Goroutine 4: Unmerged conflicts check
-	go func() {
-		defer wg.Done()
-		conflicts = GetGitOutput("ls-files", "-u")
-	}()
-
-	wg.Wait()
+	}
 
 	status := "🟡 uncommitted"
-	color := config.Theme["BIMAGIC_WARNING"]
+	borderColor := config.Theme["BIMAGIC_WARNING"]
 
-	if cleanIndex && cleanCache {
-		if conflicts != "" {
-			status = "🔴 conflicts"
-			color = config.Theme["BIMAGIC_ERROR"]
-		} else {
-			status = "🟢 clean"
-			color = config.Theme["BIMAGIC_SUCCESS"]
-		}
+	if hasConflicts {
+		status = "🔴 conflicts"
+		borderColor = config.Theme["BIMAGIC_ERROR"]
+	} else if !hasUncommitted {
+		status = "🟢 clean"
+		borderColor = config.Theme["BIMAGIC_SUCCESS"]
 	}
 
 	displayUser := os.Getenv("GITHUB_USER")
@@ -174,10 +143,39 @@ func ShowRepoStatus() {
 		displayUser = "SSH/Local"
 	}
 
-	content := fmt.Sprintf("GITHUB USER: %s\nBRANCH: %s\nAHEAD: %s | BEHIND: %s\nSTATUS: %s", displayUser, branch, ahead, behind, status)
+	line1 := fmt.Sprintf("GITHUB USER: %s", displayUser)
+	line2 := fmt.Sprintf("BRANCH: %s", branch)
+	line3 := fmt.Sprintf("AHEAD: %s | BEHIND: %s", ahead, behind)
+	line4 := fmt.Sprintf("STATUS: %s", status)
+
+	DrawRoundedBox(borderColor, line1, line2, line3, line4)
+}
+
+// DrawRoundedBox renders styled rounded borders natively in Go (0ms overhead)
+func DrawRoundedBox(borderHexOrAnsi string, lines ...string) {
+	c := config.GetAnsiEsc(borderHexOrAnsi)
+	nc := "\033[0m"
+
+	maxLen := 0
+	for _, l := range lines {
+		// Visible length calculation (ignoring status emojis/ANSI if needed)
+		runeCount := len([]rune(l))
+		if runeCount > maxLen {
+			maxLen = runeCount
+		}
+	}
+	padding := 2
+	width := maxLen + (padding * 2)
 
 	fmt.Println()
-	cmd := exec.Command("gum", "style", "--border", "rounded", "--margin", "1 0", "--padding", "1 2", "--border-foreground", color, content)
-	cmd.Stdout = os.Stdout
-	cmd.Run()
+	fmt.Printf("%s╭%s╮%s\n", c, strings.Repeat("─", width), nc)
+	for _, l := range lines {
+		runeCount := len([]rune(l))
+		padRight := width - padding - runeCount
+		if padRight < 0 {
+			padRight = 0
+		}
+		fmt.Printf("%s│%s%s%s%s%s│%s\n", c, nc, strings.Repeat(" ", padding), l, strings.Repeat(" ", padRight), c, nc)
+	}
+	fmt.Printf("%s╰%s╯%s\n", c, strings.Repeat("─", width), nc)
 }

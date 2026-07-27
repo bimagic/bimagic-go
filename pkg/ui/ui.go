@@ -187,9 +187,13 @@ func GumSpin(title string, cmdArgs ...string) bool {
 }
 
 func GumStyleWithArgs(colorArg string, text string) {
-	cmd := exec.Command("gum", "style", colorArg, text)
-	cmd.Stdout = os.Stdout
-	cmd.Run()
+	fg := config.Theme["BIMAGIC_PRIMARY"]
+	if strings.HasPrefix(colorArg, "--foreground=") {
+		fg = strings.TrimPrefix(colorArg, "--foreground=")
+	}
+	c := config.GetAnsiEsc(fg)
+	nc := "\033[0m"
+	fmt.Printf("%s%s%s\n", c, text, nc)
 }
 
 func GumFilterStdin(items, placeholder string, noLimit bool) string {
