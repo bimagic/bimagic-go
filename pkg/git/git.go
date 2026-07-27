@@ -176,11 +176,16 @@ func DrawRoundedBox(borderHexOrAnsi string, lines ...string) {
 			maxLen = w
 		}
 	}
-	padding := 2
+	padding := 4
 	width := maxLen + (padding * 2)
+	minWidth := 38
+	if width < minWidth {
+		width = minWidth
+	}
 
 	fmt.Println()
 	fmt.Printf("%s╭%s╮%s\n", c, strings.Repeat("─", width), nc)
+	fmt.Printf("%s│%s%s│%s\n", c, strings.Repeat(" ", width), c, nc)
 	for _, l := range lines {
 		w := displayCols(l)
 		padRight := width - padding - w
@@ -189,5 +194,6 @@ func DrawRoundedBox(borderHexOrAnsi string, lines ...string) {
 		}
 		fmt.Printf("%s│%s%s%s%s%s│%s\n", c, nc, strings.Repeat(" ", padding), l, strings.Repeat(" ", padRight), c, nc)
 	}
+	fmt.Printf("%s│%s%s│%s\n", c, strings.Repeat(" ", width), c, nc)
 	fmt.Printf("%s╰%s╯%s\n", c, strings.Repeat("─", width), nc)
 }
