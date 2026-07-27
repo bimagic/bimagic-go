@@ -14,21 +14,21 @@ func DiffWizard() {
 	}
 	for {
 		choice := ui.GumChoose("Diff & Inspection Wizard", "", "",
-			"🔍 View Unstaged Changes (git diff)",
-			"📦 View Staged Changes (git diff --staged)",
-			"📄 View Specific File Diff",
-			"🔀 Compare Branches",
+			"󰈈 View Unstaged Changes (git diff)",
+			"󰏖 View Staged Changes (git diff --staged)",
+			"󰈙 View Specific File Diff",
+			" Compare Branches",
 			"󰌍 Back",
 		)
 
 		switch choice {
-		case "🔍 View Unstaged Changes (git diff)":
+		case "󰈈 View Unstaged Changes (git diff)":
 			ui.PrintCommand("git diff")
 			git.RunCmdOutToScreen("git", "diff")
-		case "📦 View Staged Changes (git diff --staged)":
+		case "󰏖 View Staged Changes (git diff --staged)":
 			ui.PrintCommand("git diff --staged")
 			git.RunCmdOutToScreen("git", "diff", "--staged")
-		case "📄 View Specific File Diff":
+		case "󰈙 View Specific File Diff":
 			files := git.GetGitOutput("ls-files", "-m", "-d", "-o", "--exclude-standard")
 			if files == "" {
 				ui.PrintWarning("No modified files to inspect.")
@@ -39,7 +39,7 @@ func DiffWizard() {
 				ui.PrintCommand("git diff " + file)
 				git.RunCmdOutToScreen("git", "diff", file)
 			}
-		case "🔀 Compare Branches":
+		case " Compare Branches":
 			branches := git.GetGitOutput("branch", "--format=%(refname:short)")
 			if branches == "" {
 				ui.PrintWarning("No branches found.")

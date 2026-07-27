@@ -13,7 +13,7 @@ func SummonGitignore() {
 		return
 	}
 
-	ui.PrintStatus("📜 Summoning the Architect...")
+	ui.PrintStatus("󰓗 Summoning the Architect...")
 
 	if _, err := os.Stat(".gitignore"); !os.IsNotExist(err) {
 		ui.PrintWarning("A .gitignore file already exists in this directory.")
@@ -52,7 +52,7 @@ func SummonGitignore() {
 			os.Remove(".gitignore")
 			return
 		}
-		ui.PrintStatus("✨ .gitignore for " + template + " created successfully!")
+		ui.PrintStatus("󱝁 .gitignore for " + template + " created successfully!")
 	} else {
 		ui.PrintError("Failed to summon template. Check your internet connection.")
 	}

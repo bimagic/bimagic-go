@@ -15,16 +15,16 @@ func TagOperations() {
 	}
 	for {
 		choice := ui.GumChoose("Tag Operations", "", "",
-			"🏷️  List tags",
-			"➕ Create tag",
-			"🚀 Push tags to remote",
-			"❌ Delete local tag",
-			"🔥 Delete remote tag",
+			"󰓹 List tags",
+			"󰐕 Create tag",
+			" Push tags to remote",
+			"󰅖 Delete local tag",
+			"󰮘 Delete remote tag",
 			"󰌍 Back",
 		)
 
 		switch choice {
-		case "🏷️  List tags":
+		case "󰓹 List tags":
 			tags := git.GetGitOutput("tag", "-l", "-n1")
 			if tags == "" {
 				ui.PrintWarning("No tags found.")
@@ -32,7 +32,7 @@ func TagOperations() {
 				ui.PrintStatus("Repository Tags:")
 				fmt.Println(tags)
 			}
-		case "➕ Create tag":
+		case "󰐕 Create tag":
 			tagName := ui.GumInput("Enter tag name (e.g. v1.0.0)", "")
 			if tagName == "" {
 				ui.PrintWarning("Tag name is required.")
@@ -50,7 +50,7 @@ func TagOperations() {
 					ui.PrintStatus("Lightweight tag created: " + tagName)
 				}
 			}
-		case "🚀 Push tags to remote":
+		case " Push tags to remote":
 			remotesStr := git.GetGitOutput("remote")
 			if remotesStr == "" {
 				ui.PrintError("No remote configured.")
@@ -67,7 +67,7 @@ func TagOperations() {
 					ui.PrintStatus("Tags pushed successfully!")
 				}
 			}
-		case "❌ Delete local tag":
+		case "󰅖 Delete local tag":
 			tags := git.GetGitOutput("tag", "-l")
 			if tags == "" {
 				ui.PrintWarning("No tags found to delete.")
@@ -81,7 +81,7 @@ func TagOperations() {
 					ui.PrintStatus("Local tag deleted: " + selectedTag)
 				}
 			}
-		case "🔥 Delete remote tag":
+		case "󰮘 Delete remote tag":
 			tags := git.GetGitOutput("tag", "-l")
 			if tags == "" {
 				ui.PrintWarning("No tags found.")

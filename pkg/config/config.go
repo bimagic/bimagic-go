@@ -94,7 +94,7 @@ func ShowWelcomeBanner(versionFile, configDir string, isFirstTime bool) {
 	fmt.Printf("%s                              \033[0m\n", GetAnsiEsc(Theme["BANNER_COLOR_5"]))
 
 	fmt.Println()
-	execStyle(fmt.Sprintf("--foreground=%s", Theme["BIMAGIC_PRIMARY"]), "✨ Welcome to Bimagic Git Wizard "+Version+" ✨")
+	execStyle(fmt.Sprintf("--foreground=%s", Theme["BIMAGIC_PRIMARY"]), "󱝁 Welcome to Bimagic Git Wizard "+Version+" 󱝁")
 	fmt.Println()
 
 	if isFirstTime {

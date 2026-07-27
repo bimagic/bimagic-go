@@ -152,15 +152,15 @@ func main() {
 			" Clone repository",
 			" Init new repo",
 			" Add / Stage files",
-			"↩️  Unstage files",
-			"🧹 Discard local modifications",
+			"󰁯 Unstage files",
+			"󰮘 Discard local modifications",
 			" Commit changes",
 			" Push to remote",
 			" Pull latest changes",
 			" Branch operations (Switch, Create, Rename, Delete)",
-			"🏷️  Tag operations (Create, List, Push, Delete)",
-			"🔍 Diff & inspection wizard",
-			"🍒 Cherry-pick commits",
+			"󰓹 Tag operations (Create, List, Push, Delete)",
+			"󰈈 Diff & inspection wizard",
+			" Cherry-pick commits",
 			" Set remote",
 			"󱖫 Show status",
 			" Contributor Statistics",
@@ -203,19 +203,19 @@ func main() {
 		case " Add / Stage files":
 			spells.AddFilesLogic()
 
-		case "↩️  Unstage files":
+		case "󰁯 Unstage files":
 			spells.UnstageFilesLogic()
 
-		case "🧹 Discard local modifications":
+		case "󰮘 Discard local modifications":
 			spells.DiscardChangesLogic()
 
-		case "🏷️  Tag operations (Create, List, Push, Delete)":
+		case "󰓹 Tag operations (Create, List, Push, Delete)":
 			spells.TagOperations()
 
-		case "🔍 Diff & inspection wizard":
+		case "󰈈 Diff & inspection wizard":
 			spells.DiffWizard()
 
-		case "🍒 Cherry-pick commits":
+		case " Cherry-pick commits":
 			spells.CherryPickWizard()
 
 		case " Commit changes":
