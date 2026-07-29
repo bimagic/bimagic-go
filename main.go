@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"bimagic-go/pkg/config"
@@ -13,14 +15,29 @@ import (
 	"bimagic-go/pkg/ui"
 )
 
+func getTerminalWidth() int {
+	cmd := exec.Command("stty", "size")
+	cmd.Stdin = os.Stdin
+	out, err := cmd.Output()
+	if err == nil {
+		parts := strings.Fields(string(out))
+		if len(parts) >= 2 {
+			if w, err := strconv.Atoi(parts[1]); err == nil && w > 0 {
+				return w
+			}
+		}
+	}
+	return 80
+}
+
 func showHelp() {
 	c := config.GetAnsiEsc(config.Theme["BIMAGIC_PRIMARY"])
 	y := config.GetAnsiEsc(config.Theme["BIMAGIC_WARNING"])
 	g := config.GetAnsiEsc(config.Theme["BIMAGIC_MUTED"])
 	nc := "\033[0m"
 
-	fmt.Printf("%sBimagic Git Wizard %s - Direct Keymaps & CLI Reference%s\n\n", c, config.Version, nc)
-	fmt.Printf("%sUsage:%s wz [flag] [options]\n\n", y, nc)
+	fmt.Printf("%s󱝁 Bimagic Git Wizard %s - Direct Keymaps Reference%s\n", c, config.Version, nc)
+	fmt.Printf("%sUsage:%s wz [flag] [options]\n", y, nc)
 
 	keymaps := []struct {
 		Flag string
@@ -54,10 +71,80 @@ func showHelp() {
 		{"-h, --help", "Show this power user direct keymap guide"},
 	}
 
-	for _, k := range keymaps {
-		fmt.Printf("  %s%-28s%s %s%s%s\n", c, k.Flag, nc, g, k.Desc, nc)
+	termWidth := getTerminalWidth()
+
+	if termWidth >= 120 {
+		// Desktop Wide Screen: 2-Column Side-by-Side Table
+		flagW := 24
+		descW := 31
+
+		half := (len(keymaps) + 1) / 2
+		fmt.Println()
+		fmt.Printf("%s╭%s┬%s┬%s┬%s╮%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
+		fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s %-*s %s│%s %-*s %s│%s\n",
+			c, y, flagW, "DIRECT KEYMAP", c, y, descW, "DESCRIPTION", c, y, flagW, "DIRECT KEYMAP", c, y, descW, "DESCRIPTION", c, nc)
+		fmt.Printf("%s├%s┼%s┼%s┼%s┤%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
+
+		for i := 0; i < half; i++ {
+			left := keymaps[i]
+			leftFlag := left.Flag
+			if len(leftFlag) > flagW {
+				leftFlag = leftFlag[:flagW]
+			}
+			leftDesc := left.Desc
+			if len(leftDesc) > descW {
+				leftDesc = leftDesc[:descW-3] + "..."
+			}
+
+			rightFlag := ""
+			rightDesc := ""
+			if i+half < len(keymaps) {
+				right := keymaps[i+half]
+				rightFlag = right.Flag
+				if len(rightFlag) > flagW {
+					rightFlag = rightFlag[:flagW]
+				}
+				rightDesc = right.Desc
+				if len(rightDesc) > descW {
+					rightDesc = rightDesc[:descW-3] + "..."
+				}
+			}
+
+			fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s %-*s %s│%s %-*s %s│%s\n",
+				c, c, flagW, leftFlag, c, g, descW, leftDesc, c, c, flagW, rightFlag, c, g, descW, rightDesc, c, nc)
+		}
+		fmt.Printf("%s╰%s┴%s┴%s┴%s╯%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
+
+	} else if termWidth >= 80 {
+		// Medium Screen: Single Column Table
+		flagW := 28
+		descW := 55
+
+		fmt.Println()
+		fmt.Printf("%s╭%s┬%s╮%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
+		fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s\n", c, y, flagW, "DIRECT KEYMAP FLAG", c, y, descW, "COMMAND DESCRIPTION", c, nc)
+		fmt.Printf("%s├%s┼%s┤%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
+
+		for _, k := range keymaps {
+			flagStr := k.Flag
+			if len(flagStr) > flagW {
+				flagStr = flagStr[:flagW]
+			}
+			descStr := k.Desc
+			if len(descStr) > descW {
+				descStr = descStr[:descW-3] + "..."
+			}
+			fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s\n", c, c, flagW, flagStr, c, g, descW, descStr, c, nc)
+		}
+		fmt.Printf("%s╰%s┴%s╯%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
+	} else {
+		// Small Screen: Compact List Format
+		fmt.Println()
+		for _, k := range keymaps {
+			fmt.Printf("  %s%-28s%s %s%s%s\n", c, k.Flag, nc, g, k.Desc, nc)
+		}
+		fmt.Println()
 	}
-	fmt.Println()
 }
 
 func main() {
