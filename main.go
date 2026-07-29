@@ -279,41 +279,41 @@ func main() {
 		fmt.Println()
 	}
 
-	// Interactive Main Loop with Keybind Badges
+	// Interactive Main Loop
 	for {
 		ui.ClearScreen()
 		git.ShowRepoStatus()
 
 		options := []string{
-			"[d]  Clone repository",
-			"[I]  Init new repo",
-			"[A]  Add / Stage files",
-			"[U] 󰁯 Unstage files",
-			"[X] 󰮘 Discard local modifications",
-			"[c]  Commit changes",
-			"[P]  Push to remote",
-			"[p]  Pull latest changes",
-			"[b]  Branch operations (Switch, Create, Rename, Delete)",
-			"[t] 󰓹 Tag operations (Create, List, Push, Delete)",
-			"[D] 󰈈 Diff & inspection wizard",
-			"[C]  Cherry-pick commits",
-			"[r]  Set remote",
-			"[s] 󱖫 Show status",
-			"[S]  Contributor Statistics",
-			"[g]  Git graph",
-			"[a] 󰓗 Summon the Architect (.gitignore)",
-			"[R] 󰮘 Remove files/folders (rm)",
-			"[m]  Merge branches",
-			"[u]  Uninitialize repo",
-			"[k] 󰔪 Summon the Resurrection Stone (Recover lost code)",
-			"[v] 󰁯 Revert commit(s)",
-			"[w] 󰓗 Stash operations",
-			"[q] 󰈈 The Scrying Glass (Quick View)",
-			"[x] 󰿅 Exit",
+			" Clone repository",
+			" Init new repo",
+			" Add / Stage files",
+			"󰁯 Unstage files",
+			"󰮘 Discard local modifications",
+			" Commit changes",
+			" Push to remote",
+			" Pull latest changes",
+			" Branch operations (Switch, Create, Rename, Delete)",
+			"󰓹 Tag operations (Create, List, Push, Delete)",
+			"󰈈 Diff & inspection wizard",
+			" Cherry-pick commits",
+			" Set remote",
+			"󱖫 Show status",
+			" Contributor Statistics",
+			" Git graph",
+			"󰓗 Summon the Architect (.gitignore)",
+			"󰮘 Remove files/folders (rm)",
+			" Merge branches",
+			" Uninitialize repo",
+			"󰔪 Summon the Resurrection Stone (Recover lost code)",
+			"󰁯 Revert commit(s)",
+			"󰓗 Stash operations",
+			"󰈈 The Scrying Glass (Quick View)",
+			"󰿅 Exit",
 		}
 
 		choice := ui.GumChoose(
-			" Choose your spell: (type keybind or j/k to navigate)",
+			" Choose your spell: (j/k to navigate)",
 			" ",
 			config.Theme["BIMAGIC_PRIMARY"],
 			options...,
@@ -321,7 +321,7 @@ func main() {
 		fmt.Println()
 
 		switch choice {
-		case "[d]  Clone repository":
+		case " Clone repository":
 			repoURL := ui.GumInput("Enter repository URL", "")
 			if repoURL == "" {
 				continue
@@ -330,31 +330,31 @@ func main() {
 			cloneMode := ui.GumChoose("", "", "", "Standard Clone", "Interactive (Select files)")
 			spells.CloneRepo(repoURL, cloneMode == "Interactive (Select files)", repoDepth)
 
-		case "[w] 󰓗 Stash operations":
+		case "󰓗 Stash operations":
 			spells.StashOperations()
 
-		case "[I]  Init new repo":
+		case " Init new repo":
 			spells.InitRepo()
 
-		case "[A]  Add / Stage files":
+		case " Add / Stage files":
 			spells.AddFilesLogic()
 
-		case "[U] 󰁯 Unstage files":
+		case "󰁯 Unstage files":
 			spells.UnstageFilesLogic()
 
-		case "[X] 󰮘 Discard local modifications":
+		case "󰮘 Discard local modifications":
 			spells.DiscardChangesLogic()
 
-		case "[t] 󰓹 Tag operations (Create, List, Push, Delete)":
+		case "󰓹 Tag operations (Create, List, Push, Delete)":
 			spells.TagOperations()
 
-		case "[D] 󰈈 Diff & inspection wizard":
+		case "󰈈 Diff & inspection wizard":
 			spells.DiffWizard()
 
-		case "[C]  Cherry-pick commits":
+		case " Cherry-pick commits":
 			spells.CherryPickWizard()
 
-		case "[c]  Commit changes":
+		case " Commit changes":
 			commitMode := ui.GumChoose("", "", "", "󰦥 Magic Commit (Builder)", "󱐋 Quick Commit (One-line)")
 			if commitMode == "󰦥 Magic Commit (Builder)" {
 				spells.CommitWizard()
@@ -377,31 +377,31 @@ func main() {
 				}
 			}
 
-		case "[P]  Push to remote":
+		case " Push to remote":
 			spells.PushToRemote()
 
-		case "[p]  Pull latest changes":
+		case " Pull latest changes":
 			spells.PullChangesInteractive()
 
-		case "[b]  Branch operations (Switch, Create, Rename, Delete)":
+		case " Branch operations (Switch, Create, Rename, Delete)":
 			spells.CreateSwitchBranch()
 
-		case "[r]  Set remote":
+		case " Set remote":
 			git.SetupRemote("origin")
 
-		case "[s] 󱖫 Show status":
+		case "󱖫 Show status":
 			git.RunCmdOutToScreen("git", "status")
 
-		case "[R] 󰮘 Remove files/folders (rm)":
+		case "󰮘 Remove files/folders (rm)":
 			spells.RemoveFilesLogic()
 
-		case "[u]  Uninitialize repo":
+		case " Uninitialize repo":
 			spells.UninitializeRepo()
 
-		case "[q] 󰈈 The Scrying Glass (Quick View)":
+		case "󰈈 The Scrying Glass (Quick View)":
 			spells.ScryingGlass()
 
-		case "[x] 󰿅 Exit":
+		case "󰿅 Exit":
 			if ui.GumConfirm("Are you sure you want to exit?") {
 				fmt.Println("Git Wizard vanishes in a puff of smoke...")
 				os.Exit(0)
@@ -409,22 +409,22 @@ func main() {
 				continue
 			}
 
-		case "[m]  Merge branches":
+		case " Merge branches":
 			spells.MergeBranches()
 
-		case "[S]  Contributor Statistics":
+		case " Contributor Statistics":
 			spells.ShowContributorStats()
 
-		case "[a] 󰓗 Summon the Architect (.gitignore)":
+		case "󰓗 Summon the Architect (.gitignore)":
 			spells.SummonGitignore()
 
-		case "[k] 󰔪 Summon the Resurrection Stone (Recover lost code)":
+		case "󰔪 Summon the Resurrection Stone (Recover lost code)":
 			spells.ResurrectCommit()
 
-		case "[v] 󰁯 Revert commit(s)":
+		case "󰁯 Revert commit(s)":
 			spells.RevertCommits()
 
-		case "[g]  Git graph":
+		case " Git graph":
 			spells.DrawGitGraphBox()
 			ui.GumSpin("Drawing git graph...", "sleep", "2")
 			spells.PrettyGitLog()
