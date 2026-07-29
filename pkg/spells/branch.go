@@ -224,9 +224,33 @@ func PullChangesInteractive() {
 		ui.PrintWarning("Fetch encountered issues.")
 	}
 
-	pullChoice := ui.GumChoose("Select pull mode", "", "", "Pull specific branch", "Pull all")
+	pullChoice := ui.GumChoose("Select pull mode:", "", "",
+		" Pull with Rebase (git pull --rebase)",
+		" Standard Pull (git pull)",
+		" Pull specific branch",
+		" Pull all remotes (git pull --all)",
+	)
 
-	if pullChoice == "Pull all" {
+	switch pullChoice {
+	case " Pull with Rebase (git pull --rebase)":
+		ui.PrintCommand("git pull --rebase")
+		err := git.RunGitCmd("pull", "--rebase")
+		if err == nil {
+			ui.PrintStatus("Successfully pulled and rebased local commits!")
+		} else {
+			ui.PrintError("Pull with rebase encountered conflicts! Use 'wz --conflicts' to resolve.")
+		}
+
+	case " Standard Pull (git pull)":
+		ui.PrintCommand("git pull")
+		err := git.RunGitCmd("pull")
+		if err == nil {
+			ui.PrintStatus("Pull complete.")
+		} else {
+			ui.PrintError("Pull failed.")
+		}
+
+	case " Pull all remotes (git pull --all)":
 		if ui.GumConfirm("Run 'git pull --all'?") {
 			ui.PrintCommand("git pull --all")
 			ui.GumSpin("Pulling all...", "git", "pull", "--all")
@@ -234,7 +258,8 @@ func PullChangesInteractive() {
 		} else {
 			ui.PrintStatus("Pull cancelled.")
 		}
-	} else if pullChoice == "Pull specific branch" {
+
+	case " Pull specific branch":
 		branch := ui.GumInput("Enter branch to pull", "main")
 		if branch == "" {
 			branch = "main"

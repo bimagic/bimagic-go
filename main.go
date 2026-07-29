@@ -394,7 +394,7 @@ func main() {
 			" Branch operations (Switch, Create, Rename, Delete)",
 			"󰏫 Interactive Rebase & Squash",
 			"󰅖 Resolve Merge Conflicts",
-			"🔍 Inspect Line Blame History",
+			"󰈈 Inspect Line Blame History",
 			"󰓗 Submodule Manager",
 			"󰓹 Tag operations (Create, List, Push, Delete)",
 			"󰈈 Diff & inspection wizard",
