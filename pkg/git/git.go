@@ -5,11 +5,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"bimagic-go/pkg/config"
 	"bimagic-go/pkg/ui"
 )
+
+var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
+
+func stripAnsi(s string) string {
+	return ansiRegex.ReplaceAllString(s, "")
+}
 
 func RunGitCmd(args ...string) error {
 	cmd := exec.Command("git", args...)
@@ -92,7 +99,7 @@ func SetupRemote(remoteName string) bool {
 	return false
 }
 
-// ShowRepoStatus parses git status in a single-pass porcelain v2 execution (< 5ms)
+// ShowRepoStatus parses git status in a single-pass porcelain v2 execution (< 5ms) using pure Nerd Font icons
 func ShowRepoStatus() {
 	cmd := exec.Command("git", "status", "--porcelain=v2", "--branch")
 	outBytes, err := cmd.Output()
@@ -127,14 +134,21 @@ func ShowRepoStatus() {
 		}
 	}
 
-	status := "🟡 uncommitted"
+	cPrimary := config.GetAnsiEsc(config.Theme["BIMAGIC_PRIMARY"])
+	cSuccess := config.GetAnsiEsc(config.Theme["BIMAGIC_SUCCESS"])
+	cWarning := config.GetAnsiEsc(config.Theme["BIMAGIC_WARNING"])
+	cError := config.GetAnsiEsc(config.Theme["BIMAGIC_ERROR"])
+	cMuted := config.GetAnsiEsc(config.Theme["BIMAGIC_MUTED"])
+	nc := "\033[0m"
+
+	statusText := cWarning + "󰀦 uncommitted" + nc
 	borderColor := config.Theme["BIMAGIC_PRIMARY"]
 
 	if hasConflicts {
-		status = "🔴 conflicts"
+		statusText = cError + "󰅖 conflicts" + nc
 		borderColor = config.Theme["BIMAGIC_ERROR"]
 	} else if !hasUncommitted {
-		status = "🟢 clean"
+		statusText = cSuccess + "󰄬 clean" + nc
 		borderColor = config.Theme["BIMAGIC_SUCCESS"]
 	}
 
@@ -143,25 +157,18 @@ func ShowRepoStatus() {
 		displayUser = "SSH/Local"
 	}
 
-	line1 := fmt.Sprintf("GITHUB USER: %s", displayUser)
-	line2 := fmt.Sprintf("BRANCH: %s", branch)
-	line3 := fmt.Sprintf("AHEAD: %s | BEHIND: %s", ahead, behind)
-	line4 := fmt.Sprintf("STATUS: %s", status)
+	header := fmt.Sprintf("%s🪄 BIMAGIC GIT WIZARD%s  %s%s%s", cPrimary, nc, cMuted, config.Version, nc)
+	line1 := fmt.Sprintf("%s USER    :%s %s", cMuted, nc, displayUser)
+	line2 := fmt.Sprintf("%s BRANCH  :%s %s%s%s", cMuted, nc, cPrimary, branch, nc)
+	line3 := fmt.Sprintf("%s⇅ SYNC    :%s ⇡%s  ⇣%s", cMuted, nc, ahead, behind)
+	line4 := fmt.Sprintf("%s󱖫 STATUS  :%s %s", cMuted, nc, statusText)
 
-	DrawRoundedBox(borderColor, line1, line2, line3, line4)
+	DrawRoundedBox(borderColor, header, line1, line2, line3, line4)
 }
 
 func displayCols(s string) int {
-	w := 0
-	for _, r := range s {
-		// Emoji symbols (like 🟡, 🔴, 🟢) occupy 2 display columns in terminal emulators
-		if r == '🟡' || r == '🟢' || r == '🔴' || r == '✨' || (r >= 0x1F300 && r <= 0x1F9FF) {
-			w += 2
-		} else {
-			w += 1
-		}
-	}
-	return w
+	cleanStr := stripAnsi(s)
+	return len([]rune(cleanStr))
 }
 
 // DrawRoundedBox renders styled rounded borders natively in Go (0ms overhead) with precise column alignment
@@ -178,7 +185,7 @@ func DrawRoundedBox(borderHexOrAnsi string, lines ...string) {
 	}
 	padding := 4
 	width := maxLen + (padding * 2)
-	minWidth := 38
+	minWidth := 40
 	if width < minWidth {
 		width = minWidth
 	}
