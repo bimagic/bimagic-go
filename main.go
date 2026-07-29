@@ -71,13 +71,26 @@ func showHelp() {
 		{"-h, --help", "Show this power user direct keymap guide"},
 	}
 
+	maxFlagW := 0
+	maxDescW := 0
+	for _, k := range keymaps {
+		if len(k.Flag) > maxFlagW {
+			maxFlagW = len(k.Flag)
+		}
+		if len(k.Desc) > maxDescW {
+			maxDescW = len(k.Desc)
+		}
+	}
+
+	flagW := maxFlagW + 1
+	descW := maxDescW + 1
 	termWidth := getTerminalWidth()
 
-	if termWidth >= 120 {
-		// Desktop Wide Screen: 2-Column Side-by-Side Table
-		flagW := 24
-		descW := 31
+	twoColWidth := (flagW + descW + 5) * 2
+	oneColWidth := flagW + descW + 5
 
+	if termWidth >= twoColWidth {
+		// Ultra-Wide Screen: 2-Column Side-by-Side Table (Full Un-truncated Text)
 		half := (len(keymaps) + 1) / 2
 		fmt.Println()
 		fmt.Printf("%s╭%s┬%s┬%s┬%s╮%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
@@ -87,58 +100,32 @@ func showHelp() {
 
 		for i := 0; i < half; i++ {
 			left := keymaps[i]
-			leftFlag := left.Flag
-			if len(leftFlag) > flagW {
-				leftFlag = leftFlag[:flagW]
-			}
-			leftDesc := left.Desc
-			if len(leftDesc) > descW {
-				leftDesc = leftDesc[:descW-3] + "..."
-			}
-
 			rightFlag := ""
 			rightDesc := ""
 			if i+half < len(keymaps) {
 				right := keymaps[i+half]
 				rightFlag = right.Flag
-				if len(rightFlag) > flagW {
-					rightFlag = rightFlag[:flagW]
-				}
 				rightDesc = right.Desc
-				if len(rightDesc) > descW {
-					rightDesc = rightDesc[:descW-3] + "..."
-				}
 			}
 
 			fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s %-*s %s│%s %-*s %s│%s\n",
-				c, c, flagW, leftFlag, c, g, descW, leftDesc, c, c, flagW, rightFlag, c, g, descW, rightDesc, c, nc)
+				c, c, flagW, left.Flag, c, g, descW, left.Desc, c, c, flagW, rightFlag, c, g, descW, rightDesc, c, nc)
 		}
 		fmt.Printf("%s╰%s┴%s┴%s┴%s╯%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
 
-	} else if termWidth >= 80 {
-		// Medium Screen: Single Column Table
-		flagW := 28
-		descW := 55
-
+	} else if termWidth >= oneColWidth {
+		// Desktop / Laptop Screen: Single Column Table (Full Un-truncated Text)
 		fmt.Println()
 		fmt.Printf("%s╭%s┬%s╮%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
 		fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s\n", c, y, flagW, "DIRECT KEYMAP FLAG", c, y, descW, "COMMAND DESCRIPTION", c, nc)
 		fmt.Printf("%s├%s┼%s┤%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
 
 		for _, k := range keymaps {
-			flagStr := k.Flag
-			if len(flagStr) > flagW {
-				flagStr = flagStr[:flagW]
-			}
-			descStr := k.Desc
-			if len(descStr) > descW {
-				descStr = descStr[:descW-3] + "..."
-			}
-			fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s\n", c, c, flagW, flagStr, c, g, descW, descStr, c, nc)
+			fmt.Printf("%s│%s %-*s %s│%s %-*s %s│%s\n", c, c, flagW, k.Flag, c, g, descW, k.Desc, c, nc)
 		}
 		fmt.Printf("%s╰%s┴%s╯%s\n", c, strings.Repeat("─", flagW+2), strings.Repeat("─", descW+2), nc)
 	} else {
-		// Small Screen: Compact List Format
+		// Small Screen / Split Pane: Compact List Format
 		fmt.Println()
 		for _, k := range keymaps {
 			fmt.Printf("  %s%-28s%s %s%s%s\n", c, k.Flag, nc, g, k.Desc, nc)
