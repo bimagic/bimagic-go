@@ -13,37 +13,90 @@ import (
 	"bimagic-go/pkg/ui"
 )
 
+func showHelp() {
+	c := config.GetAnsiEsc(config.Theme["BIMAGIC_PRIMARY"])
+	y := config.GetAnsiEsc(config.Theme["BIMAGIC_WARNING"])
+	g := config.GetAnsiEsc(config.Theme["BIMAGIC_MUTED"])
+	nc := "\033[0m"
+
+	fmt.Printf("%sBimagic Git Wizard %s - Direct Keymaps & CLI Reference%s\n\n", c, config.Version, nc)
+	fmt.Printf("%sUsage:%s wz [flag] [options]\n\n", y, nc)
+
+	keymaps := []struct {
+		Flag string
+		Desc string
+	}{
+		{"-d, --clone [url] [-i]", "Clone repository (optional -i interactive sparse)"},
+		{"-I, --init", "Initialize a new Git repository (main default)"},
+		{"-A, --add", "Stage files interactively"},
+		{"-U, --unstage", "Unstage files (git restore --staged)"},
+		{"-X, --discard", "Discard local uncommitted edits (git checkout --)"},
+		{"-c, --commit", "Magic Commit (Conventional Commits builder)"},
+		{"-P, --push", "Push local commits to remote repository"},
+		{"-p, --pull", "Pull latest changes from remote"},
+		{"-b, --branch", "Branch operations (switch, create, rename, delete)"},
+		{"-t, --tag", "Tag operations (create, list, push, delete)"},
+		{"-D, --diff", "Diff & inspection wizard (unstaged, staged, file, branch)"},
+		{"-C, --cherry", "Cherry-pick commits onto current branch"},
+		{"-r, --remote", "Configure HTTPS token or SSH remotes"},
+		{"-s, --status", "Show status dashboard (<5ms single-pass)"},
+		{"-S, --stats", "Contributor statistics and activity analysis"},
+		{"-g, --graph", "Display pretty git log tree graph"},
+		{"-a, --architect", "Summon the Architect (.gitignore generator)"},
+		{"-R, --remove", "Safely remove files/folders with git integration"},
+		{"-m, --merge", "Merge branches with conflict detection"},
+		{"--uninit", "Uninitialize Git repository (remove .git)"},
+		{"-k, --resurrect", "Resurrection Stone (recover lost reflog commits)"},
+		{"-v, --revert", "Revert one or more commits (multi-select)"},
+		{"-w, --stash", "Stash operations (push, pop, list, apply, drop, clear)"},
+		{"-q, --quickview", "The Scrying Glass (instant file browser)"},
+		{"-z, --lazy [msg]", "The Lazy Wizard (Add + Commit + Push)"},
+		{"-h, --help", "Show this power user direct keymap guide"},
+	}
+
+	for _, k := range keymaps {
+		fmt.Printf("  %s%-28s%s %s%s%s\n", c, k.Flag, nc, g, k.Desc, nc)
+	}
+	fmt.Println()
+}
+
 func main() {
 	// Enable multi-core CPU parallelism
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	// 1. Handle Version Flag
-	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
-		fmt.Printf("Bimagic Git Wizard %s\n", config.Version)
-		os.Exit(0)
-	}
-
-	// 2. Load Config & Theme
+	// Load Config & Theme
 	homeDir, _ := os.UserHomeDir()
 	configDir := filepath.Join(homeDir, ".config", "bimagic")
 	themeFile := filepath.Join(configDir, "theme.wz")
 	config.LoadTheme(themeFile)
 
-	// 3. Ensure gum is installed
+	// Handle Version / Help Flags
+	if len(os.Args) > 1 {
+		arg := os.Args[1]
+		if arg == "--version" || arg == "-version" {
+			fmt.Printf("Bimagic Git Wizard %s\n", config.Version)
+			os.Exit(0)
+		} else if arg == "-h" || arg == "--help" {
+			showHelp()
+			os.Exit(0)
+		}
+	}
+
+	// Ensure gum is installed
 	if !ui.HasCmd("gum") {
 		fmt.Println("Error: gum is not installed.")
 		fmt.Println("Please install it: https://github.com/charmbracelet/gum")
 		os.Exit(1)
 	}
 
-	// 4. Parse CLI arguments
+	// Parse CLI arguments
 	var cliMode, cliURL, cliMsg, cliDepth string
 	cliInteractive := false
 
 	args := os.Args[1:]
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
-		case "-d":
+		case "-d", "--clone":
 			cliMode = "clone"
 			if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
 				cliURL = args[i+1]
@@ -54,28 +107,60 @@ func main() {
 				cliDepth = args[i+1]
 				i++
 			}
-		case "-i":
+		case "-i", "--interactive":
 			cliInteractive = true
-		case "-z":
+		case "-z", "--lazy":
 			cliMode = "lazy"
-			if i+1 < len(args) {
+			if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
 				cliMsg = args[i+1]
 				i++
 			}
-		case "-s":
-			cliMode = "status"
-		case "-u":
-			cliMode = "undo"
-		case "-g":
-			cliMode = "graph"
-		case "-p":
+		case "-I", "--init":
+			cliMode = "init"
+		case "-A", "--add":
+			cliMode = "add"
+		case "-U", "--unstage":
+			cliMode = "unstage"
+		case "-X", "--discard":
+			cliMode = "discard"
+		case "-c", "--commit":
+			cliMode = "commit"
+		case "-P", "--push":
+			cliMode = "push"
+		case "-p", "--pull":
 			cliMode = "pull"
-		case "-a", "--architect":
-			cliMode = "architect"
+		case "-b", "--branch":
+			cliMode = "branch"
 		case "-t", "--tag":
 			cliMode = "tag"
-		case "--diff":
+		case "-D", "--diff":
 			cliMode = "diff"
+		case "-C", "--cherry":
+			cliMode = "cherry"
+		case "-r", "--remote":
+			cliMode = "remote"
+		case "-s", "--status":
+			cliMode = "status"
+		case "-S", "--stats":
+			cliMode = "stats"
+		case "-g", "--graph":
+			cliMode = "graph"
+		case "-a", "--architect":
+			cliMode = "architect"
+		case "-R", "--remove":
+			cliMode = "remove"
+		case "-m", "--merge":
+			cliMode = "merge"
+		case "--uninit":
+			cliMode = "uninit"
+		case "-k", "--resurrect":
+			cliMode = "resurrect"
+		case "-v", "--revert":
+			cliMode = "revert"
+		case "-w", "--stash":
+			cliMode = "stash"
+		case "-q", "--quickview", "--scrying":
+			cliMode = "scrying"
 		default:
 			if cliMode == "clone" && cliURL == "" {
 				cliURL = args[i]
@@ -85,20 +170,56 @@ func main() {
 		}
 	}
 
-	// 5. Handle direct CLI Modes
+	// Dispatch Direct Power User CLI Keymaps
 	switch cliMode {
 	case "clone":
 		if cliURL == "" {
-			ui.PrintError("Error: Repository URL required with -d")
+			ui.PrintError("Error: Repository URL required with -d / --clone")
 			os.Exit(1)
 		}
 		spells.CloneRepo(cliURL, cliInteractive, cliDepth)
 		os.Exit(0)
+	case "init":
+		spells.InitRepo()
+		os.Exit(0)
+	case "add":
+		spells.AddFilesLogic()
+		os.Exit(0)
+	case "unstage":
+		spells.UnstageFilesLogic()
+		os.Exit(0)
+	case "discard":
+		spells.DiscardChangesLogic()
+		os.Exit(0)
+	case "commit":
+		spells.CommitWizard()
+		os.Exit(0)
+	case "push":
+		spells.PushToRemote()
+		os.Exit(0)
+	case "pull":
+		spells.PullChangesInteractive()
+		os.Exit(0)
+	case "branch":
+		spells.CreateSwitchBranch()
+		os.Exit(0)
+	case "tag":
+		spells.TagOperations()
+		os.Exit(0)
+	case "diff":
+		spells.DiffWizard()
+		os.Exit(0)
+	case "cherry":
+		spells.CherryPickWizard()
+		os.Exit(0)
+	case "remote":
+		git.SetupRemote("origin")
+		os.Exit(0)
 	case "status":
 		git.ShowRepoStatus()
 		os.Exit(0)
-	case "pull":
-		spells.PullLatestChanges()
+	case "stats":
+		spells.ShowContributorStats()
 		os.Exit(0)
 	case "graph":
 		if !git.IsGitRepo() {
@@ -110,17 +231,32 @@ func main() {
 	case "architect":
 		spells.SummonGitignore()
 		os.Exit(0)
+	case "remove":
+		spells.RemoveFilesLogic()
+		os.Exit(0)
+	case "merge":
+		spells.MergeBranches()
+		os.Exit(0)
+	case "uninit":
+		spells.UninitializeRepo()
+		os.Exit(0)
+	case "resurrect":
+		spells.ResurrectCommit()
+		os.Exit(0)
+	case "revert":
+		spells.RevertCommits()
+		os.Exit(0)
+	case "stash":
+		spells.StashOperations()
+		os.Exit(0)
+	case "scrying":
+		spells.ScryingGlass()
+		os.Exit(0)
 	case "undo":
 		spells.TimeTurner()
 		os.Exit(0)
 	case "lazy":
 		spells.LazyWizard(cliMsg)
-		os.Exit(0)
-	case "tag":
-		spells.TagOperations()
-		os.Exit(0)
-	case "diff":
-		spells.DiffWizard()
 		os.Exit(0)
 	}
 
@@ -129,7 +265,7 @@ func main() {
 		ui.PrintWarning("GITHUB_USER or GITHUB_TOKEN not set. Defaulting to SSH/Local mode.")
 	}
 
-	// 6. Welcome Banner Logic
+	// Welcome Banner Logic
 	versionFile := filepath.Join(configDir, "version")
 	storedVersion := ""
 	if b, err := os.ReadFile(versionFile); err == nil {
@@ -143,7 +279,7 @@ func main() {
 		fmt.Println()
 	}
 
-	// 7. Interactive Main Loop
+	// Interactive Main Loop
 	for {
 		ui.ClearScreen()
 		git.ShowRepoStatus()

@@ -385,56 +385,41 @@ bimagic
 wz
 ```
 
-### Command Line Flags
+### Command Line Flags (Power User Direct Keymaps)
 
-You can also use flags to perform specific actions immediately:
+Power users can bypass the interactive menu by using direct keymap flags:
 
-- **Clone Repository**:
-  ```bash
-  bimagic -d "repo-url"
-  ```
-- **Shallow Clone**:
-  ```bash
-  bimagic -d "repo-url" --depth 1
-  ```
-- **Interactive Clone** (Select specific files/folders to download):
-  ```bash
-  bimagic -d -i "repo-url"
-  ```
-- **The Lazy Wizard** (Add + Commit + Push):
-  ```bash
-  bimagic -z "commit message"
-  ```
-- **The Crystal Ball** (Show Status Dashboard):
-  ```bash
-  bimagic -s
-  ```
-- **The Time Scroll** (Show Git Graph):
-  ```bash
-  bimagic -g
-  ```
-- **The Time Turner** (Undo last commit):
-  ```bash
-  bimagic -u
-  ```
-- **The Architect** (Summon .gitignore):
-  ```bash
-  bimagic -a
-  ```
-- **Pull Latest Changes**:
-  ```bash
-  bimagic -p
-  ```
-- **Tag Operations**:
-  ```bash
-  bimagic -t
-  ```
-- **Diff & Inspection**:
-  ```bash
-  bimagic --diff
-  ```
+| Keymap Flag | Operation Description |
+| :--- | :--- |
+| `wz -d [url] [-i]` | **Clone Repository** (optional `-i` for interactive sparse checkout) |
+| `wz -I` / `wz --init` | **Init New Repo** (guaranteed `main` branch default) |
+| `wz -A` / `wz --add` | **Add / Stage Files** interactively |
+| `wz -U` / `wz --unstage` | **Unstage Files** (`git restore --staged`) |
+| `wz -X` / `wz --discard` | **Discard Local Modifications** (`git checkout --`) |
+| `wz -c` / `wz --commit` | **Magic Commit Builder** (Conventional Commits specification) |
+| `wz -P` / `wz --push` | **Push to Remote** (auto-configures upstream tracking) |
+| `wz -p` / `wz --pull` | **Pull Latest Changes** from remote |
+| `wz -b` / `wz --branch` | **Branch Operations** (switch, create, rename `-m`, delete `-d`/`-D`) |
+| `wz -t` / `wz --tag` | **Tag Operations** (create, list, push, delete local & remote tags) |
+| `wz -D` / `wz --diff` | **Diff & Inspection Wizard** (unstaged, staged, file, branch diffs) |
+| `wz -C` / `wz --cherry` | **Cherry-Pick Wizard** (pluck commits onto current branch) |
+| `wz -r` / `wz --remote` | **Set Remote** (configure HTTPS token or SSH remotes) |
+| `wz -s` / `wz --status` | **Status Dashboard** (<5ms single-pass execution) |
+| `wz -S` / `wz --stats` | **Contributor Statistics** (activity highlights & numstat analysis) |
+| `wz -g` / `wz --graph` | **Git Graph** (pretty git log tree view) |
+| `wz -a` / `wz --architect` | **Summon the Architect** (.gitignore generator with 70+ blueprints) |
+| `wz -R` / `wz --remove` | **Remove Files/Folders** (safe `git rm` integration) |
+| `wz -m` / `wz --merge` | **Merge Branches** (with conflict detection) |
+| `wz --uninit` | **Uninitialize Repo** (remove `.git` tracking) |
+| `wz -k` / `wz --resurrect` | **Resurrection Stone** (recover lost commits from reflog) |
+| `wz -v` / `wz --revert` | **Revert Commit(s)** (multi-select revert) |
+| `wz -w` / `wz --stash` | **Stash Operations** (push, pop, list, apply, drop, clear) |
+| `wz -q` / `wz --quickview` | **The Scrying Glass** (instant file browser with `fzf` & `bat`) |
+| `wz -u` / `wz --undo` | **Time Turner** (undo last commit: soft, mixed, hard) |
+| `wz -z "message"` | **The Lazy Wizard** (Add + Commit + Push fast track) |
+| `wz -h` / `wz --help` | **Show Direct Keymaps Help Menu** |
 
-You'll be presented with an interactive menu where you can choose from various Git operations.
+You'll be presented with an interactive menu if no flags are passed.
 
 ### Status Dashboard
 
