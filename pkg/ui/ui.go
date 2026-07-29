@@ -54,7 +54,17 @@ func PrintWarning(msg string) {
 }
 
 func DrawProgressBar(label string, percent int) {
-	width := 30
+	DrawProgressBarWithStats(label, percent, "", "")
+}
+
+func DrawProgressBarWithStats(label string, percent int, speed string, eta string) {
+	width := 24
+	if percent > 100 {
+		percent = 100
+	}
+	if percent < 0 {
+		percent = 0
+	}
 	filled := (percent * width) / 100
 	empty := width - filled
 
@@ -65,9 +75,18 @@ func DrawProgressBar(label string, percent int) {
 	p := config.GetAnsiEsc(config.Theme["BIMAGIC_PRIMARY"])
 	g := config.GetAnsiEsc(config.Theme["BIMAGIC_MUTED"])
 	y := config.GetAnsiEsc(config.Theme["BIMAGIC_WARNING"])
+	s := config.GetAnsiEsc(config.Theme["BIMAGIC_SUCCESS"])
 	nc := "\033[0m"
 
-	fmt.Printf("\r\033[K%s%-20s%s [%s%s%s%s%s%s] %s%3d%%%s", c, label, nc, p, bar, nc, g, bg, nc, y, percent, nc)
+	statsStr := ""
+	if speed != "" {
+		statsStr += fmt.Sprintf("  %s│%s  %s%s%s", g, nc, p, speed, nc)
+	}
+	if eta != "" {
+		statsStr += fmt.Sprintf("  %s│%s  %s%s%s", g, nc, s, eta, nc)
+	}
+
+	fmt.Printf("\r\033[K%s%-18s%s [%s%s%s%s%s%s] %s%3d%%%s%s", c, label, nc, p, bar, nc, g, bg, nc, y, percent, nc, statsStr)
 }
 
 func GenerateBar(percentage float64) string {

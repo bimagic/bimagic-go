@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"bimagic-go/pkg/git"
 	"bimagic-go/pkg/ui"
@@ -114,22 +115,63 @@ func RunGitCloneWithProgress(args []string) bool {
 	})
 
 	objRegex := regexp.MustCompile(`Receiving objects:\s+(\d+)%`)
+	speedRegex := regexp.MustCompile(`\|\s*([0-9\.]+\s*[KMGT]?i?B/s)`)
 	deltaRegex := regexp.MustCompile(`Resolving deltas:\s+(\d+)%`)
 	updateRegex := regexp.MustCompile(`Updating files:\s+(\d+)%`)
 
+	phaseStartTime := time.Now()
+	lastPhase := ""
+
 	for scanner.Scan() {
 		line := scanner.Text()
+		var label string
+		var p int
+		var speedStr string
+		var etaStr string
+
 		if m := objRegex.FindStringSubmatch(line); len(m) > 1 {
-			p, _ := strconv.Atoi(m[1])
-			ui.DrawProgressBar("Receiving Objects", p)
+			label = "Receiving Objects"
+			p, _ = strconv.Atoi(m[1])
+			if sm := speedRegex.FindStringSubmatch(line); len(sm) > 1 {
+				speedStr = "⚡ " + strings.TrimSpace(sm[1])
+			}
 		} else if m := deltaRegex.FindStringSubmatch(line); len(m) > 1 {
-			p, _ := strconv.Atoi(m[1])
-			ui.DrawProgressBar("Resolving Deltas", p)
+			label = "Resolving Deltas"
+			p, _ = strconv.Atoi(m[1])
 		} else if m := updateRegex.FindStringSubmatch(line); len(m) > 1 {
-			p, _ := strconv.Atoi(m[1])
-			ui.DrawProgressBar("Updating Files", p)
+			label = "Updating Files"
+			p, _ = strconv.Atoi(m[1])
+		} else {
+			continue
 		}
+
+		if label != lastPhase {
+			phaseStartTime = time.Now()
+			lastPhase = label
+		}
+
+		if p > 0 && p < 100 {
+			elapsed := time.Since(phaseStartTime)
+			totalEstimated := time.Duration(float64(elapsed) / (float64(p) / 100.0))
+			remaining := totalEstimated - elapsed
+			if remaining < 0 {
+				remaining = 0
+			}
+			secs := int(remaining.Seconds())
+			mins := secs / 60
+			secs = secs % 60
+			if mins > 0 {
+				etaStr = fmt.Sprintf("󱎫 ETA: %02dm%02ds", mins, secs)
+			} else {
+				etaStr = fmt.Sprintf("󱎫 ETA: %02ds", secs)
+			}
+		} else if p >= 100 {
+			etaStr = "󰄬 Done"
+		}
+
+		ui.DrawProgressBarWithStats(label, p, speedStr, etaStr)
 	}
+
 	err := cmd.Wait()
 	fmt.Println()
 	return err == nil
