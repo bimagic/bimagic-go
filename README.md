@@ -435,31 +435,35 @@ At the top of the interface, a prominent status box summarizes:
 
 ### Menu Options
 
-1. ** Clone repository** - Clone a repository from a URL (supports standard and interactive modes)
+1. ** Clone repository** - Clone a repository (supports standard & interactive sparse checkout with real-time transfer speed `󱐋` and `󱎫 ETA`)
 2. ** Init new repo** - Initialize a new Git repository (guaranteed `main` branch default)
 3. ** Add / Stage files** - Stage files (interactive multi-select; includes `[ALL]`)
 4. **󰁯 Unstage files** - Unstage files interactively (`git restore --staged`)
 5. **󰮘 Discard local modifications** - Revert unstaged changes (`git checkout --`)
 6. ** Commit changes** - Commit staged changes with Magic Commit (Conventional) or Quick Commit
 7. ** Push to remote** - Push changes (handles multiple remotes and auto-configuration)
-8. ** Pull latest changes** - Fetch and merge changes from remote
+8. ** Pull latest changes** - Fetch and merge changes (supports `git pull --rebase`, standard pull, and specific branch pull)
 9. ** Branch operations** - Create, switch, rename (`-m`), or delete (`-d`/`-D`) branches
-10. **󰓹 Tag operations** - Create, list, push, and delete local/remote tags
-11. **󰈈 Diff & inspection wizard** - Inspect unstaged, staged, file diffs, or compare branches
-12. ** Cherry-pick commits** - Select and apply specific commits onto current branch
-13. ** Set remote** - Configure remotes (supports HTTPS with token or SSH)
-14. **󱖫 Show status** - Display single-pass repo status dashboard (<5ms)
-15. ** Contributor Statistics** - View per-author activity with time range selection
-16. ** Git graph** - Pretty git log with graph and decorations
-17. **󰓗 Summon the Architect (.gitignore)** - Interactive .gitignore generator with 70+ blueprints
-18. **󰮘 Remove files/folders (rm)** - Safely remove files/folders with git integration
-19. ** Merge branches** - Merge a selected branch into the current one
-20. ** Uninitialize repo** – Remove Git tracking from a project
-21. **󰔪 Summon the Resurrection Stone** - Recover lost commits or branches using Git reflog
-22. **󰁯 Revert commit(s)** - Revert one or more commits (multi-select)
-23. **󰓗 Stash operations** - Manage stashes (push, pop, list, apply, drop, clear)
-24. **󰈈 The Scrying Glass (Quick View)** - Browse and preview any file in the repository instantly
-25. **󰿅 Exit** - Quit the wizard
+10. **󰏫 Interactive Rebase & Squash** - Combine N commits into 1 (`git reset --soft`), interactive rebase (`git rebase -i`), or rebase onto target branch
+11. **󰅖 Resolve Merge Conflicts** - 1-click conflict resolution (Accept Ours `--ours`, Accept Theirs `--theirs`, or open in `$EDITOR`)
+12. **󰈈 Inspect Line Blame History** - Line-by-line commit & author attribution with `fzf` file selection and `bat` syntax highlighting
+13. **󰓗 Submodule Manager** - Initialize, sync (`--recursive`), or add Git submodules
+14. **󰓹 Tag operations** - Create, list, push, and delete local/remote tags
+15. **󰈈 Diff & inspection wizard** - Inspect unstaged, staged, file diffs, or compare branches
+16. ** Cherry-pick commits** - Select and apply specific commits onto current branch
+17. ** Set remote** - Configure remotes (supports HTTPS with token or SSH)
+18. **󱖫 Show status** - Display single-pass repo status dashboard (<5ms)
+19. ** Contributor Statistics** - View per-author activity with time range selection
+20. ** Git graph** - Pretty git log with graph and decorations
+21. **󰓗 Summon the Architect (.gitignore)** - Interactive .gitignore generator with 70+ blueprints
+22. **󰮘 Remove files/folders (rm)** - Safely remove files/folders with git integration
+23. ** Merge branches** - Merge a selected branch into the current one
+24. ** Uninitialize repo** – Remove Git tracking from a project
+25. **󰔪 Summon the Resurrection Stone** - Recover lost commits or branches using Git reflog
+26. **󰁯 Revert commit(s)** - Revert one or more commits (multi-select)
+27. **󰓗 Stash operations** - Manage stashes (push, pop, list, apply, drop, clear)
+28. **󰈈 The Scrying Glass (Quick View)** - Browse and preview any file in the repository instantly
+29. **󰿅 Exit** - Quit the wizard
 
 ### Clone repository (Option 1)
 
@@ -529,6 +533,47 @@ Comprehensive branch management:
 - **Create Branch**: Prompt for new branch name (`git checkout -b <name>`).
 - **Rename Branch**: Rename the current branch (`git branch -m <new-name>`).
 - **Delete Branch**: Interactively select local branches to delete with safe (`-d`) or force (`-D`) options.
+
+### Interactive Rebase & Commit Squash Wizard (Option 10)
+
+Clean up draft commits and organize commit histories:
+- **Quick 1-Click Squash**: Combines last $N$ draft commits into a single clean commit with a custom commit message (`git reset --soft HEAD~N` + `git commit -m`).
+- **Interactive Rebase**: Launches `git rebase -i HEAD~N` in your terminal editor.
+- **Target Branch Rebase**: Rebases current branch onto any target branch (`main` / `dev`).
+- **Abort Rebase**: Cancel ongoing rebase safely (`git rebase --abort`).
+
+CLI Usage: `wz -K` or `wz --rebase`
+
+### Conflict Resolution Assistant (Option 11)
+
+Streamlined 1-click interface to resolve merge or rebase conflicts when status shows `󰅖 conflicts`:
+- **Auto Detection**: Automatically scans and lists all unmerged files (`diff-filter=U`).
+- **1-Click Resolution**:
+  - **Accept Ours (`--ours`)**: Keep current branch version and auto-stage.
+  - **Accept Theirs (`--theirs`)**: Keep incoming branch version and auto-stage.
+  - **Manual Edit**: Launch `$EDITOR` (Neovim / Vim / Nano) to resolve `<<<<<<<` markers manually.
+- **Auto Commit**: Detects when all conflicts are resolved and prompts to finalize the merge.
+
+CLI Usage: `wz -x` or `wz --conflicts`
+
+### Code Blame & Line History Inspector (Option 12)
+
+View line-by-line commit and author attribution for any file in the repository:
+- **Fuzzy File Picker**: Select any file interactively (`fzf`).
+- **Side-by-Side Attribution**: Displays author, commit date, hash, and code line.
+- **Syntax Highlighting**: Integrates with `bat` when installed.
+
+CLI Usage: `wz -B` or `wz --blame`
+
+### Submodule Manager (Option 13)
+
+Manage nested Git submodules effortlessly:
+- **Init & Update**: Recursively initialize and download all nested submodules (`git submodule update --init --recursive`).
+- **Sync**: Sync remote URLs across submodules (`git submodule sync --recursive`).
+- **Add Submodule**: Interactively add a new submodule repository at a specific path (`git submodule add <url> <path>`).
+- **Status**: Inspect status of all submodules (`git submodule status`).
+
+CLI Usage: `wz -M` or `wz --submodule`
 
 ### The Lazy Wizard (`-z` CLI Flag)
 
