@@ -133,7 +133,7 @@ func RunGitCloneWithProgress(args []string) bool {
 			label = "Receiving Objects"
 			p, _ = strconv.Atoi(m[1])
 			if sm := speedRegex.FindStringSubmatch(line); len(sm) > 1 {
-				speedStr = "⚡ " + strings.TrimSpace(sm[1])
+				speedStr = "󱐋 " + strings.TrimSpace(sm[1])
 			}
 		} else if m := deltaRegex.FindStringSubmatch(line); len(m) > 1 {
 			label = "Resolving Deltas"
