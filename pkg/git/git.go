@@ -157,7 +157,7 @@ func ShowRepoStatus() {
 		displayUser = "SSH/Local"
 	}
 
-	header := fmt.Sprintf("%s🪄 BIMAGIC GIT WIZARD%s  %s%s%s", cPrimary, nc, cMuted, config.Version, nc)
+	header := fmt.Sprintf("%s󰓗 BIMAGIC GIT WIZARD%s  %s%s%s", cPrimary, nc, cMuted, config.Version, nc)
 	line1 := fmt.Sprintf("%s USER    :%s %s", cMuted, nc, displayUser)
 	line2 := fmt.Sprintf("%s BRANCH  :%s %s%s%s", cMuted, nc, cPrimary, branch, nc)
 	line3 := fmt.Sprintf("%s⇅ SYNC    :%s ⇡%s  ⇣%s", cMuted, nc, ahead, behind)
@@ -168,7 +168,15 @@ func ShowRepoStatus() {
 
 func displayCols(s string) int {
 	cleanStr := stripAnsi(s)
-	return len([]rune(cleanStr))
+	w := 0
+	for _, r := range cleanStr {
+		if r == '🪄' || r == '🟡' || r == '🟢' || r == '🔴' || r == '✨' || r == 0x26A0 || r == 0xFE0F || (r >= 0x1F000 && r <= 0x1FAFF) || (r >= 0x2600 && r <= 0x27BF) {
+			w += 2
+		} else {
+			w += 1
+		}
+	}
+	return w
 }
 
 // DrawRoundedBox renders styled rounded borders natively in Go (0ms overhead) with precise column alignment
