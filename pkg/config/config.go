@@ -40,9 +40,9 @@ func LoadTheme(path string) {
 		}
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) == 2 {
-			key := parts[0]
-			val := strings.Trim(parts[1], `"' `)
-			if _, exists := Theme[key]; exists {
+			key := strings.TrimSpace(parts[0])
+			val := strings.Trim(strings.TrimSpace(parts[1]), `"' `)
+			if key != "" && val != "" {
 				Theme[key] = val
 			}
 		}
