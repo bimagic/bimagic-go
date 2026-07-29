@@ -52,6 +52,10 @@ func showHelp() {
 		{"-P, --push", "Push local commits to remote repository"},
 		{"-p, --pull", "Pull latest changes from remote"},
 		{"-b, --branch", "Branch operations (switch, create, rename, delete)"},
+		{"-K, --rebase", "Interactive Rebase & Commit Squash Wizard"},
+		{"-x, --conflicts", "Interactive Conflict Resolution Assistant"},
+		{"-B, --blame", "Code Blame & Line History Inspector"},
+		{"-M, --submodule", "Git Submodule Manager (Init, Sync, Add)"},
 		{"-t, --tag", "Tag operations (create, list, push, delete)"},
 		{"-D, --diff", "Diff & inspection wizard (unstaged, staged, file, branch)"},
 		{"-C, --cherry", "Cherry-pick commits onto current branch"},
@@ -205,6 +209,14 @@ func main() {
 			cliMode = "pull"
 		case "-b", "--branch":
 			cliMode = "branch"
+		case "-K", "--rebase":
+			cliMode = "rebase"
+		case "-x", "--conflicts":
+			cliMode = "conflicts"
+		case "-B", "--blame":
+			cliMode = "blame"
+		case "-M", "--submodule":
+			cliMode = "submodule"
 		case "-t", "--tag":
 			cliMode = "tag"
 		case "-D", "--diff":
@@ -276,6 +288,18 @@ func main() {
 		os.Exit(0)
 	case "branch":
 		spells.CreateSwitchBranch()
+		os.Exit(0)
+	case "rebase":
+		spells.RebaseWizard()
+		os.Exit(0)
+	case "conflicts":
+		spells.ConflictAssistant()
+		os.Exit(0)
+	case "blame":
+		spells.BlameWizard()
+		os.Exit(0)
+	case "submodule":
+		spells.SubmoduleManager()
 		os.Exit(0)
 	case "tag":
 		spells.TagOperations()
@@ -368,6 +392,10 @@ func main() {
 			" Push to remote",
 			" Pull latest changes",
 			" Branch operations (Switch, Create, Rename, Delete)",
+			"󰏫 Interactive Rebase & Squash",
+			"󰅖 Resolve Merge Conflicts",
+			"🔍 Inspect Line Blame History",
+			"󰓗 Submodule Manager",
 			"󰓹 Tag operations (Create, List, Push, Delete)",
 			"󰈈 Diff & inspection wizard",
 			" Cherry-pick commits",
@@ -418,6 +446,18 @@ func main() {
 
 		case "󰮘 Discard local modifications":
 			spells.DiscardChangesLogic()
+
+		case "󰏫 Interactive Rebase & Squash":
+			spells.RebaseWizard()
+
+		case "󰅖 Resolve Merge Conflicts":
+			spells.ConflictAssistant()
+
+		case "🔍 Inspect Line Blame History":
+			spells.BlameWizard()
+
+		case "󰓗 Submodule Manager":
+			spells.SubmoduleManager()
 
 		case "󰓹 Tag operations (Create, List, Push, Delete)":
 			spells.TagOperations()

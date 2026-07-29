@@ -400,6 +400,10 @@ Power users can bypass the interactive menu by using direct keymap flags:
 | `wz -P` / `wz --push` | **Push to Remote** (auto-configures upstream tracking) |
 | `wz -p` / `wz --pull` | **Pull Latest Changes** from remote |
 | `wz -b` / `wz --branch` | **Branch Operations** (switch, create, rename `-m`, delete `-d`/`-D`) |
+| `wz -K` / `wz --rebase` | **Interactive Rebase & Squash** (combine N commits, interactive rebase) |
+| `wz -x` / `wz --conflicts` | **Conflict Resolution Assistant** (1-click Ours/Theirs or $EDITOR edit) |
+| `wz -B` / `wz --blame` | **Code Blame Inspector** (line-by-line author & commit history) |
+| `wz -M` / `wz --submodule` | **Git Submodule Manager** (Init, Sync, Add submodules) |
 | `wz -t` / `wz --tag` | **Tag Operations** (create, list, push, delete local & remote tags) |
 | `wz -D` / `wz --diff` | **Diff & Inspection Wizard** (unstaged, staged, file, branch diffs) |
 | `wz -C` / `wz --cherry` | **Cherry-Pick Wizard** (pluck commits onto current branch) |
