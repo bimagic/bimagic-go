@@ -157,7 +157,7 @@ func ShowRepoStatus() {
 		displayUser = "SSH/Local"
 	}
 
-	header := fmt.Sprintf("%s󰓗 BIMAGIC GIT WIZARD%s  %s%s%s", cPrimary, nc, cMuted, config.Version, nc)
+	header := fmt.Sprintf("%s BIMAGIC GIT WIZARD%s  %s%s%s", cPrimary, nc, cMuted, config.Version, nc)
 	line1 := fmt.Sprintf("%s USER    :%s %s", cMuted, nc, displayUser)
 	line2 := fmt.Sprintf("%s BRANCH  :%s %s%s%s", cMuted, nc, cPrimary, branch, nc)
 	line3 := fmt.Sprintf("%s⇅ SYNC    :%s ⇡%s  ⇣%s", cMuted, nc, ahead, behind)
