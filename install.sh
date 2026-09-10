@@ -55,7 +55,7 @@ banner() {
  ▐▙▄▞▘█       ▐▌ ▐▌▝▚▄▞▘█ ▝▚▄▄▖
 EOF
     printf "${RESET}\n"
-    printf "${PURPLE}${BOLD}✨ Bimagic Go Installer ✨${RESET}\n\n"
+    printf "${PURPLE}${BOLD}󱝁 Bimagic Go Installer 󱝁${RESET}\n\n"
 }
 
 cleanup() {

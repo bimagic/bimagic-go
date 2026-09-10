@@ -192,6 +192,7 @@ func GumConfirm(prompt string) bool {
 func GumSpin(title string, cmdArgs ...string) bool {
 	args := []string{
 		"spin",
+		"--show-error",
 		"--spinner.foreground", config.Theme["BIMAGIC_PRIMARY"],
 		"--title.foreground", config.Theme["BIMAGIC_INFO"],
 		"--title", title,

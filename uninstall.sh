@@ -55,7 +55,7 @@ banner() {
  ▐▙▄▞▘█       ▐▌ ▐▌▝▚▄▞▘█ ▝▚▄▄▖
 EOF
     printf "${RESET}\n"
-    printf "${PURPLE}${BOLD}✨ Bimagic Go Uninstaller ✨${RESET}\n\n"
+    printf "${PURPLE}${BOLD}󱝁 Bimagic Go Uninstaller 󱝁${RESET}\n\n"
 }
 
 remove_binary() {
@@ -138,7 +138,7 @@ main() {
     remove_binary
     clean_config "${1:-}"
 
-    success "Uninstallation complete. Git Wizard has vanished in a puff of smoke! ✨"
+    success "Uninstallation complete. Git Wizard has vanished in a puff of smoke! 󱝁"
 }
 
 main "$@"
