@@ -21,3 +21,15 @@ func TestDrainStdin(t *testing.T) {
 	// Ensure DrainStdin runs without panicking
 	DrainStdin()
 }
+
+func TestGumSpin(t *testing.T) {
+	// Test success command
+	if !GumSpin("Testing success", "echo", "ok") {
+		t.Errorf("Expected GumSpin with echo to return true")
+	}
+
+	// Test failing command
+	if GumSpin("Testing failure", "sh", "-c", "exit 1") {
+		t.Errorf("Expected GumSpin with exit 1 to return false")
+	}
+}

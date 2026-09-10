@@ -2,11 +2,13 @@ package ui
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"bimagic-go/pkg/config"
 )
@@ -190,22 +192,58 @@ func GumConfirm(prompt string) bool {
 }
 
 func GumSpin(title string, cmdArgs ...string) bool {
-	args := []string{
-		"spin",
-		"--show-error",
-		"--spinner.foreground", config.Theme["BIMAGIC_PRIMARY"],
-		"--title.foreground", config.Theme["BIMAGIC_INFO"],
-		"--title", title,
-		"--",
+	if len(cmdArgs) == 0 {
+		return true
 	}
-	args = append(args, cmdArgs...)
-	cmd := exec.Command("gum", args...)
-	cmd.Stdin = strings.NewReader("")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
+
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+
+	if err := cmd.Start(); err != nil {
+		return false
+	}
+
+	frames := []string{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"}
+	spinnerColor := config.GetAnsiEsc(config.Theme["BIMAGIC_PRIMARY"])
+	titleColor := config.GetAnsiEsc(config.Theme["BIMAGIC_INFO"])
+	nc := "\033[0m"
+
+	done := make(chan struct{})
+	go func() {
+		ticker := time.NewTicker(80 * time.Millisecond)
+		defer ticker.Stop()
+		idx := 0
+		fmt.Print("\033[?25l")
+		for {
+			select {
+			case <-done:
+				fmt.Print("\r\033[K\033[?25h")
+				return
+			case <-ticker.C:
+				frame := frames[idx%len(frames)]
+				fmt.Printf("\r\033[K%s%s%s %s%s%s", spinnerColor, frame, nc, titleColor, title, nc)
+				idx++
+			}
+		}
+	}()
+
+	cmdErr := cmd.Wait()
+	close(done)
+	time.Sleep(10 * time.Millisecond)
 	DrainStdin()
-	return err == nil
+
+	if cmdErr != nil {
+		if stderrBuf.Len() > 0 {
+			fmt.Fprint(os.Stderr, stderrBuf.String())
+		} else if stdoutBuf.Len() > 0 {
+			fmt.Fprint(os.Stdout, stdoutBuf.String())
+		}
+		return false
+	}
+
+	return true
 }
 
 func GumStyleWithArgs(colorArg string, text string) {
