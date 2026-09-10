@@ -16,3 +16,8 @@ func TestGenerateBar(t *testing.T) {
 		t.Errorf("Expected filled blocks in 100%% bar, got %q", bar100)
 	}
 }
+
+func TestDrainStdin(t *testing.T) {
+	// Ensure DrainStdin runs without panicking
+	DrainStdin()
+}

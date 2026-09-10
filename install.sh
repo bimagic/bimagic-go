@@ -11,14 +11,14 @@ BINARY_NAME="bimagic"
 
 # Styling & Colors
 if [ -t 1 ]; then
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[1;33m'
-    BLUE='\033[0;34m'
-    PURPLE='\033[0;35m'
-    CYAN='\033[0;36m'
-    BOLD='\033[1m'
-    RESET='\033[0m'
+    RED=$'\033[0;31m'
+    GREEN=$'\033[0;32m'
+    YELLOW=$'\033[1;33m'
+    BLUE=$'\033[0;34m'
+    PURPLE=$'\033[0;35m'
+    CYAN=$'\033[0;36m'
+    BOLD=$'\033[1m'
+    RESET=$'\033[0m'
 else
     RED=''
     GREEN=''
@@ -31,19 +31,19 @@ else
 fi
 
 info() {
-    printf "${BLUE}[INFO]${RESET} %s\n" "$1"
+    printf "%b\n" "${BLUE}[INFO]${RESET} $1"
 }
 
 success() {
-    printf "${GREEN}[SUCCESS]${RESET} %s\n" "$1"
+    printf "%b\n" "${GREEN}[SUCCESS]${RESET} $1"
 }
 
 warn() {
-    printf "${YELLOW}[WARNING]${RESET} %s\n" "$1"
+    printf "%b\n" "${YELLOW}[WARNING]${RESET} $1"
 }
 
 error() {
-    printf "${RED}[ERROR]${RESET} %s\n" "$1" >&2
+    printf "%b\n" "${RED}[ERROR]${RESET} $1" >&2
 }
 
 banner() {

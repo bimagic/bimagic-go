@@ -199,10 +199,12 @@ func GumSpin(title string, cmdArgs ...string) bool {
 	}
 	args = append(args, cmdArgs...)
 	cmd := exec.Command("gum", args...)
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = strings.NewReader("")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run() == nil
+	err := cmd.Run()
+	DrainStdin()
+	return err == nil
 }
 
 func GumStyleWithArgs(colorArg string, text string) {

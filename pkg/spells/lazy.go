@@ -22,7 +22,7 @@ func LazyWizard(cliMsg string) {
 	ui.PrintStatus("  Lazy Wizard invoked!")
 
 	ui.PrintCommand("git add .")
-	if ui.GumSpin("Adding files...", "git", "add", ".") {
+	if git.RunGitCmd("add", ".") == nil {
 		ui.PrintStatus("Files added.")
 	} else {
 		ui.PrintError("Failed to add files.")
