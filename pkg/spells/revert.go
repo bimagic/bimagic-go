@@ -22,8 +22,9 @@ func RevertCommits() {
 
 	var hashes []string
 	for _, line := range strings.Split(commitsSelection, "\n") {
-		if line != "" {
-			hashes = append(hashes, strings.Fields(line)[0])
+		fields := strings.Fields(line)
+		if len(fields) > 0 {
+			hashes = append(hashes, fields[0])
 		}
 	}
 

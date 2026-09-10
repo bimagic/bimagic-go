@@ -30,7 +30,12 @@ func CherryPickWizard() {
 		return
 	}
 
-	commitHash := strings.Fields(selected)[0]
+	fields := strings.Fields(selected)
+	if len(fields) == 0 {
+		ui.PrintWarning("Cherry-pick cancelled.")
+		return
+	}
+	commitHash := fields[0]
 
 	if ui.GumConfirm(fmt.Sprintf("Cherry-pick commit %s onto '%s'?", commitHash, currentBranch)) {
 		ui.PrintCommand("git cherry-pick " + commitHash)

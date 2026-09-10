@@ -29,7 +29,12 @@ func ResurrectCommit() {
 		return
 	}
 
-	targetHash := strings.Fields(selectedLog)[0]
+	fields := strings.Fields(selectedLog)
+	if len(fields) == 0 {
+		ui.PrintStatus("Resurrection cancelled.")
+		return
+	}
+	targetHash := fields[0]
 
 	fmt.Println()
 	cmd := exec.Command("gum", "style", "--border", "rounded", "--border-foreground", config.Theme["BIMAGIC_PRIMARY"], "--padding", "1 2", "TARGET TIMELINE:", selectedLog)

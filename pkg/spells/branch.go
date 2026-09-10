@@ -319,7 +319,7 @@ func MergeBranches() {
 			if ui.GumSpin("Merging...", "git", "merge", mergeBranch) {
 				ui.PrintStatus("Merge successful!")
 			} else {
-				ui.PrintError("Merge had conflicts! Resolve them manually.")
+				ui.PrintError("Merge encountered conflicts! Use 'wz --conflicts' to resolve.")
 			}
 		} else {
 			ui.PrintStatus("Merge cancelled.")

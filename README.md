@@ -1,4 +1,4 @@
-# Bimagic v2.0.0 - The Go-Powered Git Wizard 🔮
+# Bimagic v2.1.0 - The Go-Powered Git Wizard 🔮
 
 <p align="center">
   <img width="400" style="border-radius: 12px;" alt="Bimagic Logo" src="./Sample/logo.png" />
@@ -461,9 +461,10 @@ At the top of the interface, a prominent status box summarizes:
 24. ** Uninitialize repo** – Remove Git tracking from a project
 25. **󰔪 Summon the Resurrection Stone** - Recover lost commits or branches using Git reflog
 26. **󰁯 Revert commit(s)** - Revert one or more commits (multi-select)
-27. **󰓗 Stash operations** - Manage stashes (push, pop, list, apply, drop, clear)
-28. **󰈈 The Scrying Glass (Quick View)** - Browse and preview any file in the repository instantly
-29. **󰿅 Exit** - Quit the wizard
+27. **󱦟 Undo last commit (Time Turner)** - Undo recent commits with Soft, Mixed, or Hard level resets
+28. **󰓗 Stash operations** - Manage stashes (push, pop, list, apply, drop, clear)
+29. **󰈈 The Scrying Glass (Quick View)** - Browse and preview any file in the repository instantly
+30. **󰿅 Exit** - Quit the wizard
 
 ### Clone repository (Option 1)
 

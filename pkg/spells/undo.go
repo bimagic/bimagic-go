@@ -34,7 +34,7 @@ func TimeTurner() {
 			ui.PrintCommand("git reset --soft HEAD~1")
 			git.RunGitCmd("reset", "--soft", "HEAD~1")
 		}
-		ui.PrintStatus("✨ Success! I undid the commit, but kept your files ready to commit again.")
+		ui.PrintStatus("󰄬 Success! I undid the commit, but kept your files ready to commit again.")
 	case strings.HasPrefix(undoType, "Mixed"):
 		if isInitialCommit {
 			ui.PrintCommand("git update-ref -d HEAD")

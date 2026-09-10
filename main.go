@@ -71,6 +71,7 @@ func showHelp() {
 		{"-v, --revert", "Revert one or more commits (multi-select)"},
 		{"-w, --stash", "Stash operations (push, pop, list, apply, drop, clear)"},
 		{"-q, --quickview", "The Scrying Glass (instant file browser)"},
+		{"-u, --undo", "Time Turner (undo last commit: soft, mixed, hard)"},
 		{"-z, --lazy [msg]", "The Lazy Wizard (Add + Commit + Push)"},
 		{"-h, --help", "Show this power user direct keymap guide"},
 	}
@@ -247,6 +248,8 @@ func main() {
 			cliMode = "stash"
 		case "-q", "--quickview", "--scrying":
 			cliMode = "scrying"
+		case "-u", "--undo":
+			cliMode = "undo"
 		default:
 			if cliMode == "clone" && cliURL == "" {
 				cliURL = args[i]
@@ -409,6 +412,7 @@ func main() {
 			" Uninitialize repo",
 			"󰔪 Summon the Resurrection Stone (Recover lost code)",
 			"󰁯 Revert commit(s)",
+			"󱦟 Undo last commit (Time Turner)",
 			"󰓗 Stash operations",
 			"󰈈 The Scrying Glass (Quick View)",
 			"󰿅 Exit",
@@ -453,7 +457,7 @@ func main() {
 		case "󰅖 Resolve Merge Conflicts":
 			spells.ConflictAssistant()
 
-		case "🔍 Inspect Line Blame History":
+		case "󰈈 Inspect Line Blame History":
 			spells.BlameWizard()
 
 		case "󰓗 Submodule Manager":
@@ -537,6 +541,9 @@ func main() {
 
 		case "󰁯 Revert commit(s)":
 			spells.RevertCommits()
+
+		case "󱦟 Undo last commit (Time Turner)":
+			spells.TimeTurner()
 
 		case " Git graph":
 			spells.DrawGitGraphBox()
