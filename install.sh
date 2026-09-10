@@ -31,19 +31,19 @@ else
 fi
 
 info() {
-    printf "%b\n" "${BLUE}[INFO]${RESET} $1"
+    printf "%b\n" "${BLUE}󰋽 [INFO]${RESET} $1"
 }
 
 success() {
-    printf "%b\n" "${GREEN}[SUCCESS]${RESET} $1"
+    printf "%b\n" "${GREEN}󰄬 [SUCCESS]${RESET} $1"
 }
 
 warn() {
-    printf "%b\n" "${YELLOW}[WARNING]${RESET} $1"
+    printf "%b\n" "${YELLOW}󰀦 [WARNING]${RESET} $1"
 }
 
 error() {
-    printf "%b\n" "${RED}[ERROR]${RESET} $1" >&2
+    printf "%b\n" "${RED}󰅖 [ERROR]${RESET} $1" >&2
 }
 
 banner() {

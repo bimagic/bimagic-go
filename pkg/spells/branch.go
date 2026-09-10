@@ -49,23 +49,23 @@ func CreateSwitchBranch() {
 		}
 		uniqueBranches[b] = true
 		if b == currentBranch {
-			fmt.Printf("%s➤ %s%s (current)\n", green, b, nc)
+			fmt.Printf("%s %s%s (current)\n", green, b, nc)
 		} else {
 			fmt.Printf("  %s\n", b)
 		}
 	}
 	fmt.Println()
 
-	branchOpt := ui.GumChoose("Branch Operations", "", "",
-		"Switch to existing branch",
-		"Create new branch",
-		"Rename current branch",
-		"Delete local branch",
-		"Cancel",
+	branchOpt := ui.GumChoose(" Branch Operations", "", "",
+		" Switch to existing branch",
+		" Create new branch",
+		"󰑕 Rename current branch",
+		" Delete local branch",
+		"󰅖 Cancel",
 	)
 
 	switch branchOpt {
-	case "Switch to existing branch":
+	case " Switch to existing branch":
 		branchesOnly := git.GetGitOutput("branch", "--format=%(refname:short)")
 		existingBranch := ui.GumFilterStdin(branchesOnly, "Select branch to switch to", false)
 		if existingBranch != "" {
@@ -75,7 +75,7 @@ func CreateSwitchBranch() {
 		} else {
 			ui.PrintWarning("No branch selected.")
 		}
-	case "Create new branch":
+	case " Create new branch":
 		newBranch := ui.GumInput("Enter new branch name", "")
 		if newBranch != "" {
 			ui.PrintCommand(`git checkout -b "` + newBranch + `"`)
@@ -84,9 +84,9 @@ func CreateSwitchBranch() {
 		} else {
 			ui.PrintError("No branch name provided.")
 		}
-	case "Rename current branch":
+	case "󰑕 Rename current branch":
 		RenameBranch()
-	case "Delete local branch":
+	case " Delete local branch":
 		DeleteBranch()
 	default:
 		ui.PrintWarning("Operation cancelled.")

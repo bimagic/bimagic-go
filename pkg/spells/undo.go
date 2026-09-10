@@ -18,15 +18,15 @@ func TimeTurner() {
 
 	isInitialCommit := git.RunGitCmd("rev-parse", "HEAD~1") != nil
 
-	undoType := ui.GumChoose("Select Undo Level:", "", "",
-		"Soft (Undo commit, keep changes staged - Best for fixing typos)",
-		"Mixed (Undo commit, keep changes unstaged - Best for splitting work)",
-		"Hard (DESTROY changes - Revert to previous state)",
-		"Cancel",
+	undoType := ui.GumChoose("󱦟 Select Undo Level:", "", "",
+		"󰄬 Soft (Undo commit, keep changes staged - Best for fixing typos)",
+		"󱞈 Mixed (Undo commit, keep changes unstaged - Best for splitting work)",
+		"󰅖 Hard (DESTROY changes - Revert to previous state)",
+		"󰅖 Cancel",
 	)
 
 	switch {
-	case strings.HasPrefix(undoType, "Soft"):
+	case strings.Contains(undoType, "Soft"):
 		if isInitialCommit {
 			ui.PrintCommand("git update-ref -d HEAD")
 			git.RunGitCmd("update-ref", "-d", "HEAD")
@@ -35,7 +35,7 @@ func TimeTurner() {
 			git.RunGitCmd("reset", "--soft", "HEAD~1")
 		}
 		ui.PrintStatus("󰄬 Success! I undid the commit, but kept your files ready to commit again.")
-	case strings.HasPrefix(undoType, "Mixed"):
+	case strings.Contains(undoType, "Mixed"):
 		if isInitialCommit {
 			ui.PrintCommand("git update-ref -d HEAD")
 			git.RunGitCmd("update-ref", "-d", "HEAD")
@@ -46,7 +46,7 @@ func TimeTurner() {
 			git.RunGitCmd("reset", "HEAD~1")
 		}
 		ui.PrintStatus("󱞈 Success! I undid the commit and unstaged the files.")
-	case strings.HasPrefix(undoType, "Hard"):
+	case strings.Contains(undoType, "Hard"):
 		if ui.GumConfirm(" DANGER: This deletes your work forever. Are you sure?") {
 			if isInitialCommit {
 				ui.PrintCommand("git update-ref -d HEAD")
