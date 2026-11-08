@@ -8,6 +8,7 @@
 *.so
 *.dylib
 bimagic
+wz
 main
 
 # Test binary, built with `go test -c`
