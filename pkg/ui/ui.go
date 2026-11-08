@@ -197,6 +197,8 @@ func GumSpin(title string, cmdArgs ...string) bool {
 	}
 
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	cmd.Stdin = os.Stdin
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=1")
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = &stdoutBuf
 	cmd.Stderr = &stderrBuf

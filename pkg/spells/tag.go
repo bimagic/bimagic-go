@@ -41,13 +41,17 @@ func TagOperations() {
 			tagMsg := ui.GumInput("Enter tag message (optional for annotated tag)", "")
 			if tagMsg != "" {
 				ui.PrintCommand(fmt.Sprintf(`git tag -a "%s" -m "%s"`, tagName, tagMsg))
-				if git.RunGitCmd("tag", "-a", tagName, "-m", tagMsg) == nil {
+				if git.RunGitCmdInteractive("tag", "-a", tagName, "-m", tagMsg) == nil {
 					ui.PrintStatus("Annotated tag created: " + tagName)
+				} else {
+					ui.PrintError("Failed to create annotated tag.")
 				}
 			} else {
 				ui.PrintCommand(fmt.Sprintf(`git tag "%s"`, tagName))
-				if git.RunGitCmd("tag", tagName) == nil {
+				if git.RunGitCmdInteractive("tag", tagName) == nil {
 					ui.PrintStatus("Lightweight tag created: " + tagName)
+				} else {
+					ui.PrintError("Failed to create lightweight tag.")
 				}
 			}
 		case " Push tags to remote":
@@ -63,8 +67,10 @@ func TagOperations() {
 			}
 			if remote != "" {
 				ui.PrintCommand(fmt.Sprintf(`git push "%s" --tags`, remote))
-				if ui.GumSpin("Pushing tags...", "git", "push", remote, "--tags") {
+				if git.RunGitCmdInteractive("push", remote, "--tags") == nil {
 					ui.PrintStatus("Tags pushed successfully!")
+				} else {
+					ui.PrintError("Failed to push tags.")
 				}
 			}
 		case "󰅖 Delete local tag":
@@ -101,8 +107,11 @@ func TagOperations() {
 				}
 				if remote != "" && ui.GumConfirm(fmt.Sprintf("Delete remote tag '%s' from '%s'?", selectedTag, remote)) {
 					ui.PrintCommand(fmt.Sprintf(`git push "%s" --delete "%s"`, remote, selectedTag))
-					git.RunGitCmd("push", remote, "--delete", selectedTag)
-					ui.PrintStatus("Remote tag deleted: " + selectedTag)
+					if git.RunGitCmdInteractive("push", remote, "--delete", selectedTag) == nil {
+						ui.PrintStatus("Remote tag deleted: " + selectedTag)
+					} else {
+						ui.PrintError("Failed to delete remote tag.")
+					}
 				}
 			}
 		case "󰌍 Back":

@@ -36,7 +36,7 @@ func RevertCommits() {
 		for _, c := range hashes {
 			fmt.Printf("Reverting commit %s...\n", c)
 			ui.PrintCommand(fmt.Sprintf("git revert --no-edit %s", c))
-			if git.RunGitCmd("revert", "--no-edit", c) == nil {
+			if git.RunGitCmdInteractive("revert", "--no-edit", c) == nil {
 				ui.PrintStatus(fmt.Sprintf("Commit %s reverted.", c))
 			} else {
 				ui.PrintError(fmt.Sprintf("Conflict occurred while reverting %s!", c))

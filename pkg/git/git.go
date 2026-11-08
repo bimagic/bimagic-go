@@ -20,6 +20,16 @@ func stripAnsi(s string) string {
 
 func RunGitCmd(args ...string) error {
 	cmd := exec.Command("git", args...)
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=1")
+	return cmd.Run()
+}
+
+func RunGitCmdInteractive(args ...string) error {
+	cmd := exec.Command("git", args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=1")
 	return cmd.Run()
 }
 

@@ -70,8 +70,11 @@ func CommitWizard() {
 
 	if ui.GumConfirm("Commit with this message?") {
 		ui.PrintCommand(`git commit -m "` + commitMsg + `"`)
-		git.RunGitCmd("commit", "-m", commitMsg)
-		ui.PrintStatus("󱝁 Mischief managed! (Commit successful)")
+		if err := git.RunGitCmdInteractive("commit", "-m", commitMsg); err == nil {
+			ui.PrintStatus("󱝁 Mischief managed! (Commit successful)")
+		} else {
+			ui.PrintError("Commit failed.")
+		}
 	} else {
 		ui.PrintWarning("Commit cancelled.")
 	}

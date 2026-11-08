@@ -484,11 +484,11 @@ func main() {
 				}
 				if ui.GumConfirm("Commit changes?") {
 					ui.PrintCommand(`git commit -m "` + msg + `"`)
-					err := git.RunGitCmd("commit", "-m", msg)
+					err := git.RunGitCmdInteractive("commit", "-m", msg)
 					if err == nil {
 						ui.PrintStatus("Commit done!")
 					} else {
-						ui.PrintStatus("Commit cancelled.")
+						ui.PrintError("Commit failed.")
 					}
 				} else {
 					ui.PrintStatus("Commit cancelled.")

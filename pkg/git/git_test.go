@@ -34,3 +34,17 @@ func TestDisplayCols(t *testing.T) {
 		t.Errorf("Expected width 8 for emoji string, got %d", w3)
 	}
 }
+
+func TestRunGitCmd(t *testing.T) {
+	// Running a basic git version command should succeed
+	if err := RunGitCmd("version"); err != nil {
+		t.Errorf("Expected RunGitCmd('version') to succeed, got %v", err)
+	}
+}
+
+func TestRunGitCmdInteractive(t *testing.T) {
+	// Running a basic git version command interactively should succeed
+	if err := RunGitCmdInteractive("version"); err != nil {
+		t.Errorf("Expected RunGitCmdInteractive('version') to succeed, got %v", err)
+	}
+}

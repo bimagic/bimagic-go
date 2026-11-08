@@ -34,13 +34,19 @@ func SubmoduleManager() {
 	switch choice {
 	case "󰁯 Init & Update Submodules (git submodule update --init --recursive)":
 		ui.PrintCommand("git submodule update --init --recursive")
-		ui.GumSpin("Updating submodules...", "git", "submodule", "update", "--init", "--recursive")
-		ui.PrintStatus("Submodules initialized and updated successfully!")
+		if err := git.RunGitCmdInteractive("submodule", "update", "--init", "--recursive"); err == nil {
+			ui.PrintStatus("Submodules initialized and updated successfully!")
+		} else {
+			ui.PrintError("Failed to initialize or update submodules.")
+		}
 
 	case "󰓗 Sync Submodules (git submodule sync --recursive)":
 		ui.PrintCommand("git submodule sync --recursive")
-		ui.GumSpin("Syncing submodules...", "git", "submodule", "sync", "--recursive")
-		ui.PrintStatus("Submodules synced successfully!")
+		if err := git.RunGitCmdInteractive("submodule", "sync", "--recursive"); err == nil {
+			ui.PrintStatus("Submodules synced successfully!")
+		} else {
+			ui.PrintError("Failed to sync submodules.")
+		}
 
 	case " Add New Submodule (git submodule add <url> <path>)":
 		subURL := ui.GumInput("Enter submodule repository URL", "")
@@ -52,7 +58,7 @@ func SubmoduleManager() {
 			return
 		}
 		ui.PrintCommand(fmt.Sprintf("git submodule add %s %s", subURL, subPath))
-		err := git.RunGitCmd("submodule", "add", subURL, subPath)
+		err := git.RunGitCmdInteractive("submodule", "add", subURL, subPath)
 		if err == nil {
 			ui.PrintStatus(fmt.Sprintf("Added submodule '%s' at '%s'!", strings.TrimSuffix(subURL, ".git"), subPath))
 		} else {

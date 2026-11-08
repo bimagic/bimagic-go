@@ -187,7 +187,11 @@ func PushToRemote() {
 	if ui.GumConfirm(fmt.Sprintf("Push branch '%s' to '%s'?", branch, remote)) {
 		fmt.Printf("Pushing branch '%s' to '%s'...\n", branch, remote)
 		ui.PrintCommand(fmt.Sprintf(`git push -u "%s" "%s"`, remote, branch))
-		ui.GumSpin("Pushing...", "git", "push", "-u", remote, branch)
+		if err := git.RunGitCmdInteractive("push", "-u", remote, branch); err == nil {
+			ui.PrintStatus(fmt.Sprintf("󱝂 Branch '%s' successfully pushed to '%s'!", branch, remote))
+		} else {
+			ui.PrintError(fmt.Sprintf("Failed to push branch '%s' to '%s'.", branch, remote))
+		}
 	} else {
 		ui.PrintStatus("Push cancelled.")
 	}
@@ -199,14 +203,14 @@ func PullLatestChanges() {
 		return
 	}
 	ui.PrintCommand("git fetch --all")
-	if ui.GumSpin("Fetching updates...", "git", "fetch", "--all") {
+	if err := git.RunGitCmdInteractive("fetch", "--all"); err == nil {
 		ui.PrintStatus("Fetch complete.")
 	} else {
 		ui.PrintWarning("Fetch encountered issues during fetch.")
 	}
 
 	ui.PrintCommand("git pull --all")
-	if ui.GumSpin("Pulling all...", "git", "pull", "--all") {
+	if err := git.RunGitCmdInteractive("pull", "--all"); err == nil {
 		ui.PrintStatus("Pull all complete.")
 	} else {
 		ui.PrintError("Pull failed. There might be conflicts or no upstream set.")
@@ -218,7 +222,7 @@ func PullChangesInteractive() {
 		ui.PrintError("Not a git repository!")
 		return
 	}
-	if ui.GumSpin("Fetching updates...", "git", "fetch", "--all") {
+	if err := git.RunGitCmdInteractive("fetch", "--all"); err == nil {
 		ui.PrintStatus("Fetch complete.")
 	} else {
 		ui.PrintWarning("Fetch encountered issues.")
@@ -234,7 +238,7 @@ func PullChangesInteractive() {
 	switch pullChoice {
 	case " Pull with Rebase (git pull --rebase)":
 		ui.PrintCommand("git pull --rebase")
-		err := git.RunGitCmd("pull", "--rebase")
+		err := git.RunGitCmdInteractive("pull", "--rebase")
 		if err == nil {
 			ui.PrintStatus("Successfully pulled and rebased local commits!")
 		} else {
@@ -243,7 +247,7 @@ func PullChangesInteractive() {
 
 	case " Standard Pull (git pull)":
 		ui.PrintCommand("git pull")
-		err := git.RunGitCmd("pull")
+		err := git.RunGitCmdInteractive("pull")
 		if err == nil {
 			ui.PrintStatus("Pull complete.")
 		} else {
@@ -253,8 +257,11 @@ func PullChangesInteractive() {
 	case " Pull all remotes (git pull --all)":
 		if ui.GumConfirm("Run 'git pull --all'?") {
 			ui.PrintCommand("git pull --all")
-			ui.GumSpin("Pulling all...", "git", "pull", "--all")
-			ui.PrintStatus("Pull all complete.")
+			if err := git.RunGitCmdInteractive("pull", "--all"); err == nil {
+				ui.PrintStatus("Pull all complete.")
+			} else {
+				ui.PrintError("Pull failed.")
+			}
 		} else {
 			ui.PrintStatus("Pull cancelled.")
 		}
@@ -281,7 +288,11 @@ func PullChangesInteractive() {
 		if remote != "" {
 			if ui.GumConfirm(fmt.Sprintf("Pull branch '%s' from '%s'?", branch, remote)) {
 				ui.PrintCommand(fmt.Sprintf(`git pull "%s" "%s"`, remote, branch))
-				ui.GumSpin("Pulling...", "git", "pull", remote, branch)
+				if err := git.RunGitCmdInteractive("pull", remote, branch); err == nil {
+					ui.PrintStatus("Pull complete.")
+				} else {
+					ui.PrintError("Pull failed.")
+				}
 			} else {
 				ui.PrintStatus("Pull cancelled.")
 			}
@@ -316,7 +327,7 @@ func MergeBranches() {
 		if ui.GumConfirm(fmt.Sprintf("Merge branch '%s' into '%s'?", mergeBranch, currentBranch)) {
 			fmt.Printf("Merging branch '%s' into '%s'...\n", mergeBranch, currentBranch)
 			ui.PrintCommand(`git merge "` + mergeBranch + `"`)
-			if ui.GumSpin("Merging...", "git", "merge", mergeBranch) {
+			if err := git.RunGitCmdInteractive("merge", mergeBranch); err == nil {
 				ui.PrintStatus("Merge successful!")
 			} else {
 				ui.PrintError("Merge encountered conflicts! Use 'wz --conflicts' to resolve.")

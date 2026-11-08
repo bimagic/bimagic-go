@@ -39,7 +39,7 @@ func CherryPickWizard() {
 
 	if ui.GumConfirm(fmt.Sprintf("Cherry-pick commit %s onto '%s'?", commitHash, currentBranch)) {
 		ui.PrintCommand("git cherry-pick " + commitHash)
-		if git.RunGitCmd("cherry-pick", commitHash) == nil {
+		if git.RunGitCmdInteractive("cherry-pick", commitHash) == nil {
 			ui.PrintStatus(fmt.Sprintf("Commit %s cherry-picked successfully!", commitHash))
 		} else {
 			ui.PrintError("Cherry-pick encountered conflicts!")

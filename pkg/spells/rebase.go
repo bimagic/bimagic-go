@@ -53,7 +53,7 @@ func RebaseWizard() {
 				return
 			}
 			ui.PrintCommand(fmt.Sprintf(`git commit -m "%s"`, newMsg))
-			if err := git.RunGitCmd("commit", "-m", newMsg); err == nil {
+			if err := git.RunGitCmdInteractive("commit", "-m", newMsg); err == nil {
 				ui.PrintStatus(fmt.Sprintf("Successfully squashed last %d commits into 1!", n))
 			} else {
 				ui.PrintError("Failed to create squashed commit.")
@@ -82,7 +82,7 @@ func RebaseWizard() {
 		}
 		if ui.GumConfirm(fmt.Sprintf("Rebase current branch onto '%s'?", selectedBranch)) {
 			ui.PrintCommand(fmt.Sprintf("git rebase %s", selectedBranch))
-			err := git.RunGitCmd("rebase", selectedBranch)
+			err := git.RunGitCmdInteractive("rebase", selectedBranch)
 			if err == nil {
 				ui.PrintStatus("Successfully rebased onto " + selectedBranch + "!")
 			} else {
@@ -92,7 +92,7 @@ func RebaseWizard() {
 
 	case "󰅖 Abort ongoing rebase (git rebase --abort)":
 		ui.PrintCommand("git rebase --abort")
-		err := git.RunGitCmd("rebase", "--abort")
+		err := git.RunGitCmdInteractive("rebase", "--abort")
 		if err == nil {
 			ui.PrintStatus("Rebase aborted.")
 		} else {

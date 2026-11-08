@@ -33,7 +33,7 @@ func LazyWizard(cliMsg string) {
 
 	if hasStaged {
 		ui.PrintCommand(`git commit -m "` + cliMsg + `"`)
-		if git.RunGitCmd("commit", "-m", cliMsg) == nil {
+		if git.RunGitCmdInteractive("commit", "-m", cliMsg) == nil {
 			ui.PrintStatus("Committed: " + cliMsg)
 		} else {
 			ui.PrintError("Commit failed.")
@@ -64,7 +64,7 @@ func LazyWizard(cliMsg string) {
 	ui.PrintStatus("Pushing to " + branch + "...")
 
 	ui.PrintCommand("git push")
-	if ui.GumSpin("Pushing...", "git", "push") {
+	if git.RunGitCmdInteractive("push") == nil {
 		ui.PrintStatus("󱝂 Magic complete!")
 		return
 	}
@@ -74,7 +74,7 @@ func LazyWizard(cliMsg string) {
 	if !hasUpstream {
 		ui.PrintWarning("Standard push failed (no upstream). Trying to set upstream...")
 		ui.PrintCommand(`git push -u origin "` + branch + `"`)
-		if ui.GumSpin("Pushing (upstream)...", "git", "push", "-u", "origin", branch) {
+		if git.RunGitCmdInteractive("push", "-u", "origin", branch) == nil {
 			ui.PrintStatus("󱝂 Magic complete (upstream set)!")
 			return
 		}

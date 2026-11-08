@@ -97,8 +97,15 @@ func CloneRepo(url string, interactive bool, depth string) {
 
 func RunGitCloneWithProgress(args []string) bool {
 	cmd := exec.Command("git", args...)
-	stderr, _ := cmd.StderrPipe()
-	cmd.Start()
+	cmd.Stdin = os.Stdin
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=1")
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return false
+	}
+	if err := cmd.Start(); err != nil {
+		return false
+	}
 
 	scanner := bufio.NewScanner(stderr)
 	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -121,6 +128,7 @@ func RunGitCloneWithProgress(args []string) bool {
 
 	phaseStartTime := time.Now()
 	lastPhase := ""
+	var errLines []string
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -142,6 +150,11 @@ func RunGitCloneWithProgress(args []string) bool {
 			label = "Updating Files"
 			p, _ = strconv.Atoi(m[1])
 		} else {
+			trimmed := strings.TrimSpace(line)
+			if trimmed != "" {
+				fmt.Printf("\r\033[K%s\n", trimmed)
+				errLines = append(errLines, trimmed)
+			}
 			continue
 		}
 
@@ -172,7 +185,12 @@ func RunGitCloneWithProgress(args []string) bool {
 		ui.DrawProgressBarWithStats(label, p, speedStr, etaStr)
 	}
 
-	err := cmd.Wait()
+	cmdErr := cmd.Wait()
 	fmt.Println()
-	return err == nil
+	if cmdErr != nil && len(errLines) > 0 {
+		for _, l := range errLines {
+			fmt.Fprintln(os.Stderr, l)
+		}
+	}
+	return cmdErr == nil
 }

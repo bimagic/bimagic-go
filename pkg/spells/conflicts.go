@@ -99,7 +99,10 @@ func ConflictAssistant() {
 func spellsCommit() {
 	msg := ui.GumInput("Enter merge commit message", "Merge resolved conflicts")
 	if msg != "" {
-		git.RunGitCmd("commit", "-m", msg)
-		ui.PrintStatus("Merge commit completed!")
+		if err := git.RunGitCmdInteractive("commit", "-m", msg); err == nil {
+			ui.PrintStatus("Merge commit completed!")
+		} else {
+			ui.PrintError("Merge commit failed.")
+		}
 	}
 }
