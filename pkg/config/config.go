@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const Version = "v2.1.0"
+const Version = "v2.1.1"
 
 var Theme = map[string]string{
 	"BIMAGIC_PRIMARY":   "212",

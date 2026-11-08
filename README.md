@@ -1,4 +1,4 @@
-# Bimagic v2.1.0 - The Go-Powered Git Wizard 🔮
+# Bimagic v2.1.1 - The Go-Powered Git Wizard 🔮
 
 <p align="center">
   <img width="400" style="border-radius: 12px;" alt="Bimagic Logo" src="./Sample/logo.png" />
