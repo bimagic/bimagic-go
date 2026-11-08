@@ -10,7 +10,7 @@ A powerful, multi-threaded, Go-based Git automation tool that simplifies your Gi
 
 ## Overview
 
-Bimagic is a lightning-fast, Go-powered interactive command-line tool that streamlines common and advanced Git operations, making version control accessible through a user-friendly menu interface. Rebuilt in **Go** for maximum speed (sub-5ms rendering), multi-threaded performance, and cross-platform reliability, it handles repository initialization, committing, branching, tag management, diff inspection, cherry-picking, stash operations, reflog recovery, and interactive sparse checkouts with GitHub integration using personal access tokens or SSH.
+Bimagic is a lightning-fast, Go-powered interactive command-line tool that streamlines common and advanced Git operations, making version control accessible through a user-friendly menu interface. Rebuilt in **Go** for maximum speed (sub-5ms rendering), multi-threaded performance, and cross-platform reliability, it handles repository initialization, committing, branching, tag management, diff inspection, cherry-picking, stash operations, reflog recovery, and interactive sparse checkouts with GitHub integration using personal access tokens, SSH, or hardware security keys & passkeys (FIDO2 / Touch ID / YubiKey).
 
 ## Sample
 
@@ -27,7 +27,7 @@ Bimagic is a lightning-fast, Go-powered interactive command-line tool that strea
 - 🪄 **Shortcut Symlink (`wz`)**: Automatically provisions `wz -> bimagic` shortcut symlinks during installation. Run with `bimagic` or `wz`!
 - 🎨 **Full Theme Adaptation**: Every button, prompt, selector, input box, and modal dynamically inherits colors from `~/.config/bimagic/theme.wz`.
 - 🔮 **Interactive Menu-Driven Interface**: Driven by Charm's `gum` with Nerd Font iconography.
-- 🔐 **Secure GitHub Auth**: Integration via personal access tokens or SSH.
+- 🔐 **Secure GitHub Auth & Passkey Support**: First-class integration via personal access tokens, SSH, and hardware passkeys (FIDO2 / U2F / Touch ID / YubiKey) with interactive PIN and presence confirmation for pushes and commit signing.
 - 📦 **Instant Initialization**: Setup new repositories guaranteed with `main` branch default (`git init -b main`).
 - 📥 **Smart & Sparse Cloning**: Standard clone or interactive file selection (`--filter=blob:none`).
 - 📊 **Real-time Progress Bar**: Visual feedback for git object downloads and delta resolution.
@@ -582,7 +582,7 @@ The ultimate fast-track spell: `wz -z "commit message"`.
 - Automatically stages all modified and untracked files (`git add .`).
 - Commits with your message (`git commit -m`).
 - **Smart Amend**: If the working directory has no new changes but already contains a commit, it updates the previous commit message (`git commit --amend -m`).
-- Pushes directly to the remote repository (`git push`), setting up stream tracking if needed.
+- Pushes directly to the remote repository (`git push`), setting up stream tracking if needed, with full interactive passkey and touch authentication support.
 
 ### Cross-Platform Compilation
 
@@ -788,6 +788,12 @@ You can avoid needing sudo by:
 3. **Network Security**:
    - The script uses HTTPS to communicate with GitHub
    - Ensure you're on a secure network when using the tool
+
+4. **Hardware Security Keys & Passkeys (FIDO2 / U2F / Touch ID)**:
+   - Bimagic routes all Git operations (`push`, `pull`, `fetch`, `clone`, `commit`, `rebase`, `tag`) through direct interactive terminal sessions.
+   - Fully supports `ed25519-sk` and `ecdsa-sk` SSH keys, YubiKeys, Apple Touch ID via Secure Enclave, and 1Password SSH agents.
+   - Interactive security prompts (e.g. `Confirm user presence for key...` and `Enter PIN for authenticator:`) are streamed directly in real time.
+   - Cryptographic commit signing (`commit.gpgsign=true` or SSH signing) works seamlessly during Commit Wizard, Quick Commit, and Rebase operations.
 
 ## Troubleshooting
 
