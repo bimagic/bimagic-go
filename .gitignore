@@ -10,6 +10,9 @@
 bimagic
 wz
 main
+dist/
+release/
+build/
 
 # Test binary, built with `go test -c`
 *.test
